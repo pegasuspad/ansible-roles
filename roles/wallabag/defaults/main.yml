@@ -1,0 +1,38 @@
+---
+# wallabag_db_password: password for the wallabag database
+#wallabag_db_password: <REQUIRED>
+
+# wallabag_db_root_password: password for the postgres root user
+#wallabag_db_root_password: <REQUIRED>
+
+# wallabag_hostname: hostname to use for the wallabag instance [localhost]
+wallabag_hostname: localhost
+
+# wallabag_image_name: Name of the wallabag Docker image to use [docker.io/wallabag/wallabag]
+wallabag_image_name: docker.io/wallabag/wallabag
+
+# wallabag_image_version: Docker tag of the wallabag image to use [1.22.1]
+wallabag_image_version: 2.6.7
+
+# wallabag_mail: Configuration options for mail sending
+# wallabag_mail: <REQUIRED>
+# wallabag_mail.from_address: FROM address for sent emails
+# wallabag_mail.password: Password for SMTP authentication
+# wallabag_mail.smtp_host: Name of your mail server host. [Required]
+# wallabag_mail.smtp_port:Port to use for sending mail. [25]
+# wallabag_mail.username: Username for SMTP authentication
+
+# wallabag_postgres_version: Docker tag of the postgres image to use [14-alpine]
+wallabag_postgres_version: 14-alpine
+
+# wallabag_redis_image_name: Name of the redis Docker image to use for wallabag [docker.io/redis]
+wallabag_redis_image_name: docker.io/redis
+
+# wallabag_redis_image_version: Docker tag of the redis image to use [alpine]
+wallabag_redis_image_version: alpine
+
+# wallabag_secret: secret used to provide additional entropy to cryptographic functions
+# wallabag_secret: <REQUIRED>
+
+# wallabag_timezone: timezone to set for the wallabag server [America/Chicago]
+wallabag_timezone: America/Chicago

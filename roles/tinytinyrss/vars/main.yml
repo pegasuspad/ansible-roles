@@ -1,0 +1,20 @@
+__tinytinyrss_env:
+  # ADMIN_USER_PASS: <random password will be generated on startup>
+  APP_WEB_ROOT: /var/www/html/tt-rss
+  APP_BASE: ""
+  # Bind exposed port to 127.0.0.1 to run behind reverse proxy on the same host. If you plan expose the container, remove "127.0.0.1:".
+  HTTP_PORT: 127.0.0.1:8280
+  OWNER_GID: "42100"
+  OWNER_UID: "42100"
+  #PHP_WORKER_MAX_CHILDREN: 5
+  #PHP_WORKER_MEMORY_LIMIT: 256M
+  TTRSS_DB_USER: ttrss
+  TTRSS_DB_NAME: ttrss
+  TTRSS_DB_PASS: "{{ tinytinyrss_db_password }}"
+  TTRSS_SELF_URL_PATH: "{{ tinytinyrss_self_url }}"
+  # You can customize other config.php defines by setting overrides here. See tt-rss/.docker/app/Dockerfile for complete list. Examples:
+  # TTRSS_PLUGINS=auth_remote
+  # TTRSS_SINGLE_USER_MODE=true
+  # TTRSS_SESSION_COOKIE_LIFETIME=2592000
+  # TTRSS_FORCE_ARTICLE_PURGE=30
+  # ...

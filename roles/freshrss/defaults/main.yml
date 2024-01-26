@@ -1,0 +1,33 @@
+---
+# freshrss_db_password: password for the postgres database 
+#freshrss_db_password: <REQUIRED>
+
+# freshrss_hostname: hostname to use for the freshrss instance [localhost]
+freshrss_hostname: localhost
+
+# freshrss_image_name: Name of the freshrss Docker image to use [docker.io/freshrss/freshrss]
+freshrss_image_name: docker.io/freshrss/freshrss
+
+# freshrss_image_version: Docker tag of the freshrss image to use [1.22.1]
+freshrss_image_version: 1.22.1
+
+# freshrss_mercury_image_name: name of the Docker image containing the Mercury server to use [docker.io/wangqiru/mercury-parser-api]
+freshrss_mercury_image_name: docker.io/wangqiru/mercury-parser-api
+
+# freshrss_mercury_image_version: Version of the Mercury server Docker image to use [latest]
+freshrss_mercury_image_version: latest
+
+# freshrss_port: Port number on which the FreshRSS instance will be available [8080]
+freshrss_port: 8080
+
+# freshrss_postgres_version: Docker tag of the postgres image to use [16-alpine]
+freshrss_postgres_version: 16-alpine
+
+# freshrss_readability_image_name: name of the Docker image containing the Readability.js server to use [docker.io/phpdockerio/readability-js-server]
+freshrss_readability_image_name: docker.io/phpdockerio/readability-js-server
+
+# freshrss_readability_image_version: Version of the Readability.js server Docker image to use [1.6.0]
+freshrss_readability_image_version: 1.6.0
+
+# freshrss_timezone: timezone to set for the FreshRSS server [America/Chicago]
+freshrss_timezone: America/Chicago

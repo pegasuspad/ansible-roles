@@ -1,0 +1,36 @@
+# -----------------------------
+# PostgreSQL configuration file
+# -----------------------------
+#
+# This file consists of lines of the form:
+#
+#   name = value
+#
+# (The "=" is optional.)  Whitespace may be used.  Comments are introduced with
+# "#" anywhere on a line.  The complete list of parameter names and allowed
+# values can be found in the PostgreSQL documentation.
+#
+
+# - Connections -
+
+listen_addresses = '*'
+
+# - SSL -
+
+{% if postgres_ssl is defined and postgres_ssl.enabled | d(false) %}
+ssl = on
+ssl_cert_file = '/etc/postgresql/server.crt'
+ssl_key_file = '/etc/postgresql/server.key'
+{% endif %}
+
+#ssl_ca_file = ''
+#ssl_crl_file = ''....
+#ssl_crl_dir = ''
+#ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
+#ssl_prefer_server_ciphers = on
+#ssl_ecdh_curve = 'prime256v1'
+#ssl_min_protocol_version = 'TLSv1.2'
+#ssl_max_protocol_version = ''
+#ssl_dh_params_file = ''
+#ssl_passphrase_command = ''
+#ssl_passphrase_command_supports_reload = off

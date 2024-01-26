@@ -1,0 +1,114 @@
+- name: Create network for 'wallabag' containers
+  community.docker.docker_network:
+    attachable: "true"
+    name: network_wallabag
+
+- name: Get info for wallabag images volume
+  community.docker.docker_volume_info:
+    name: wallabag-images
+  register: wallabag_images_volume
+
+- name: Create wallabag images volume
+  when: not wallabag_images_volume.exists
+  block:
+    - name: Create wallabag images volume
+      community.docker.docker_volume:
+        driver: local
+        name: "wallabag-images"
+        recreate: never
+        state: present
+    - name: Fix volume permissions for non-root user
+      community.docker.docker_container:
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            chown -R -v 65534:65534 /var/www/wallabag/web/assets/images
+        detach: false
+        image: alpine
+        name: wallabag-volume-init
+        mounts:
+          - no_copy: true
+            source: "wallabag-images"
+            target: /var/www/wallabag/web/assets/images
+            type: volume
+        output_logs: true
+        restart_policy: "no"
+        state: started
+    - name: Remove volume permissions fixup container
+      community.docker.docker_container:
+        name: wallabag-volume-init
+        state: absent
+
+- name: Deploy wallabag containers
+  block:
+    - name: Deploy postgresql container
+      ansible.builtin.import_role:
+        name: postgres
+      vars:
+        postgres_db_name: postgres
+        postgres_db_password: "{{ wallabag_db_root_password }}"
+        postgres_image_version: "{{ wallabag_postgres_version }}"
+        postgres_initdb_args: ""
+        postgres_init_sql: |
+          CREATE USER wallabag WITH PASSWORD '{{ wallabag_db_password }}';
+          ALTER USER wallabag CREATEDB;
+        postgres_network:
+          name: network_wallabag
+          aliases:
+            - db
+    - name: Deploy redis container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env:
+        image: "{{ wallabag_redis_image_name }}:{{ wallabag_redis_image_version }}"
+        log_driver: local
+        log_options:
+          max-size: 10m
+        name: redis
+        networks:
+          - name: network_wallabag
+            aliases:
+              - redis
+        restart_policy: always
+        state: started
+    - name: Deploy app container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env:
+          # POSTGRES_PASSWORD: "{{ wallabag_db_root_password }}"
+          # POSTGRES_USER: postgres
+          SYMFONY__ENV__DATABASE_DRIVER: pdo_pgsql
+          SYMFONY__ENV__DATABASE_HOST: db
+          SYMFONY__ENV__DATABASE_NAME: wallabag
+          SYMFONY__ENV__DATABASE_PASSWORD: "{{ wallabag_db_password }}"
+          SYMFONY__ENV__DATABASE_PORT: "5432"
+          SYMFONY__ENV__DATABASE_USER: wallabag
+          SYMFONY__ENV__DOMAIN_NAME: "https://{{ wallabag_hostname }}"
+          SYMFONY__ENV__MAILER_DSN: "{{ __wallabag_mailer_dsn }}"
+          SYMFONY__ENV__FROM_EMAIL: "{{ wallabag_mail.from_address }}"
+          SYMFONY__ENV__SECRET: "{{ wallabag_secret }}"
+          SYMFONY__ENV__SERVER_NAME: "Wallabag (Pegasus)"
+          SYMFONY__ENV__TWOFACTOR_SENDER: "no-reply@pegasuspad.com"
+        exposed_ports:
+          - "80"
+        image: "{{ wallabag_image_name }}:{{ wallabag_image_version }}"
+        log_driver: local
+        log_options:
+          max-size: 10m
+        mounts:
+          - no_copy: true
+            source: "wallabag-images"
+            target: /var/www/wallabag/web/assets/images
+            type: volume
+        name: wallabag
+        networks:
+          - name: network_wallabag
+            aliases:
+              - app
+        published_ports:
+          - "80:80"
+        restart_policy: always
+        state: started

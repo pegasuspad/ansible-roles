@@ -1,0 +1,8 @@
+---
+- name: Install restic
+  tags: [restic, install, restic_install]
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure restic
+  tags: [restic, configure, restic_configure]
+  ansible.builtin.import_tasks: configure.yml

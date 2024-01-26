@@ -1,0 +1,113 @@
+# See: https://serverfault.com/a/1011758
+
+- name: Create ttrss configuration
+  tags: [ttrss, configure, ttrss_configure]
+  block:
+    - name: Create ttrss directory
+      ansible.builtin.file:
+        group: "{{ tinytinyrss_uid }}"
+        mode: "0555"
+        owner: "{{ tinytinyrss_uid }}"
+        path: /etc/ttrss
+        state: directory
+    - name: Create ttrss config directory
+      ansible.builtin.file:
+        group: "{{ tinytinyrss_uid }}"
+        mode: "0555"
+        owner: "{{ tinytinyrss_uid }}"
+        path: /etc/ttrss/config.d
+        state: directory
+    # - name: Copy gitea configuration
+    #   ansible.builtin.template:
+    #     dest: /etc/gitea/app.ini
+    #     group: "{{ gitea_uid }}"
+    #     owner: "{{ gitea_uid }}"
+    #     mode: "0440"
+    #     src: "etc/gitea/app.ini.j2"
+
+- name: Create network for 'ttrss' containers
+  tags: [ttrss, deploy, ttrss_deploy]
+  community.docker.docker_network:
+    attachable: "true"
+    name: network_ttrss
+
+- name: Get info for ttrss data volume
+  community.docker.docker_volume_info:
+    name: ttrss-data
+  register: ttrss_data_volume
+
+- name: Create ttrss data volume
+  when: not ttrss_data_volume.exists
+  block:
+    - name: Create ttrss data volume
+      community.docker.docker_volume:
+        driver: local
+        name: "ttrss-data"
+        recreate: never
+        state: present
+
+- name: Deploy ttrss containers
+  tags: [ttrss, deploy, ttrss_deploy]
+  block:
+    - name: Deploy postgresql docker container
+      ansible.builtin.import_role:
+        name: postgres
+      vars:
+        postgres_db_name: ttrss
+        postgres_db_password: "{{ tinytinyrss_db_password }}"
+        postgres_image_version: "{{ tinytinyrss_postgres_version }}"
+        postgres_network:
+          name: network_ttrss
+          aliases:
+            - db
+        postgres_uid: "{{ tinytinyrss_uid }}"
+    - name: Deploy app container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env: "{{ __tinytinyrss_env }}"
+        exposed_ports:
+          - "9000"
+        image:  cthulhoo/ttrss-fpm-pgsql-static:{{ tinytinyrss_app_version }}
+        mounts:
+          - no_copy: true
+            source: ttrss-data
+            target: /var/www/html
+            type: volume
+        name: ttrss-app
+        networks:
+          - name: network_ttrss
+            aliases:
+              - app
+        restart_policy: always
+        state: started
+        volumes:
+          - /etc/ttrss/config.d:/opt/tt-rss/config.d:ro
+          - /etc/localtime:/etc/localtime:ro
+          - /etc/timezone:/etc/timezone:ro
+    - name: Deploy web-nginx container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env: "{{ __tinytinyrss_env }}"
+        exposed_ports:
+          - "8280"
+        image:  cthulhoo/ttrss-web-nginx:{{ tinytinyrss_nginx_version }}
+        mounts:
+          - no_copy: true
+            read_only: true
+            source: ttrss-data
+            target: /var/www/html
+            type: volume
+        name: ttrss-web
+        networks:
+          - name: network_ttrss
+            aliases:
+              - web-nginx
+        published_ports:
+          - 8280:80
+        restart_policy: always
+        state: started
+        volumes:
+          - /etc/localtime:/etc/localtime:ro
+          - /etc/timezone:/etc/timezone:ro

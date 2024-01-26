@@ -1,0 +1,32 @@
+# postgres_db_name: name of the databse to create
+#postgres_db_name: 
+# postgres_db_password: password for remote database connections
+#postgres_db_password: 
+
+# postgres_image_name: Name of the postgresql Docker image to use [docker.io/postgres]
+postgres_image_name: docker.io/postgres
+
+# postgres_image_version: Docker tag for the postgresql image to use [16-alpine]
+postgres_image_version: 16-alpine
+
+# postgres_initdb_args: arguments to the postgres initdb process [--locale-provider=icu --icu-locale=en-US]
+postgres_initdb_args: --locale-provider=icu --icu-locale=en-US
+
+# postgres_init_sql: SQL to execute as the superuser during database initialization [none]
+#postgres_init_sql:
+
+# postgres_network: Optional configuration for the network to add the db container to [None]
+#postgres_network
+
+# postgres_service_state: state to set for containers (started, present, stopped, etc.) [started]
+postgres_service_state: started
+
+# postgres_uid: User id of the postgresql user. [root]
+#postgres_uid
+
+# postgres_volume: configuration for the postgresql data volume
+# postgres_volume.type: Type of volume. Must be one of: "local" or "nfs". [local]
+# postgres_volume.nfs_host: When "type" is "nfs", this is the host of the NFS server. 
+# postgres_volume.nfs_path: When "type" is "nfs", this is the path of the NFS share
+postgres_volume:
+  type: local

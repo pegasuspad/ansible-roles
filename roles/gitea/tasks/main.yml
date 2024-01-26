@@ -1,0 +1,108 @@
+# See: https://serverfault.com/a/1011758
+
+- name: Create gitea configuration
+  tags: [gitea, configure, gitea_configure]
+  block:
+    - name: Create gitea config directory
+      ansible.builtin.file:
+        group: "{{ gitea_uid }}"
+        mode: "0550"
+        owner: "{{ gitea_uid }}"
+        path: /etc/gitea
+        state: directory
+    - name: Copy gitea configuration
+      ansible.builtin.template:
+        dest: /etc/gitea/app.ini
+        group: "{{ gitea_uid }}"
+        owner: "{{ gitea_uid }}"
+        mode: "0440"
+        src: "etc/gitea/app.ini.j2"
+
+- name: Create network for 'gitea' containers
+  tags: [gitea, deploy, gitea_deploy]
+  community.docker.docker_network:
+    attachable: "true"
+    name: network_gitea
+
+- name: Get info for gita data volume
+  community.docker.docker_volume_info:
+    name: gitea-data
+  register: gitea_data_volume
+
+- name: Create gitea data volume
+  when: not gitea_data_volume.exists
+  block:
+    - name: Create gitea data volume
+      community.docker.docker_volume:
+        driver: local
+        name: "gitea-data"
+        recreate: never
+        state: present
+    - name: Fix volume permissions for non-root user
+      when: gitea_uid is defined
+      community.docker.docker_container:
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            chown -R -v "{{ gitea_uid }}:{{ gitea_uid }}" /var/lib/gitea
+        detach: false
+        image: alpine
+        name: gitea-volume-init
+        mounts:
+          - no_copy: true
+            source: "gitea-data"
+            target: /var/lib/gitea
+            type: volume
+        output_logs: true
+        restart_policy: "no"
+        state: started
+    - name: Remove volume permissions fixup container
+      when: gitea_uid is defined
+      community.docker.docker_container:
+        name: gitea-volume-init
+        state: absent
+
+- name: Deploy gitea containers
+  tags: [gitea, deploy, gitea_deploy]
+  block:
+    - name: Deploy postgresql docker container
+      ansible.builtin.import_role:
+        name: postgres
+      vars:
+        postgres_db_name: gitea
+        postgres_db_password: "{{ gitea_db_password }}"
+        postgres_image_version: 16-alpine
+        postgres_network:
+          name: network_gitea
+          aliases:
+            - db
+        postgres_uid: "{{ gitea_uid }}"
+    - name: Deploy gitea container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        exposed_ports:
+          - "3000"
+          - "2222"
+        image: gitea/gitea:{{ gitea_image_version }}
+        mounts:
+          - no_copy: true
+            source: gitea-data
+            target: /var/lib/gitea
+            type: volume
+        name: gitea
+        networks:
+          - name: network_gitea
+            aliases:
+              - gitea
+        published_ports:
+          - 3000:3000
+          - 2222:2222
+        restart_policy: always
+        state: started
+        user: "{{ gitea_uid }}:{{ gitea_uid }}"
+        volumes:
+          - /etc/gitea:/etc/gitea:ro
+          - /etc/localtime:/etc/localtime:ro
+          - /etc/timezone:/etc/timezone:ro

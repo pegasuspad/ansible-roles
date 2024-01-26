@@ -1,0 +1,28 @@
+---
+- name: "Ensure primary group exists: {{ user.username }}"
+  become: true
+  ansible.builtin.group:
+    gid: "{{ user.uid | default(omit) }}"
+    name: "{{ user.username }}"
+    state: present
+
+- name: "Ensure group exists: {{ group }}"
+  become: true
+  loop: "{{ user.groups | default([]) }}"
+  loop_control:
+    loop_var: group
+  ansible.builtin.group:
+    name: "{{ group }}"
+    state: present
+
+- name: "Create user account: {{ user.username }}"
+  become: true
+  ansible.builtin.user:
+    create_home: "{{ user.create_home | default(not (user.system | default(false))) }}"
+    group: "{{ user.username }}"
+    groups: "{{ user.groups | default(omit) }}"
+    name: "{{ user.username }}"
+    password: "!"
+    shell: "{{ user.shell | default(user.system | default(false) | ternary('/bin/false', '/bin/bash')) }}"
+    system: "{{ user.system | default(false) }}"
+    uid: "{{ user.uid | default(omit) }}"

@@ -1,0 +1,4 @@
+# __freshrss_env: environment variables to pass to FreshRSS containers
+__freshrss_env:
+  SERVER_DNS: "{{ freshrss_hostname }}"
+  TZ: "{{ freshrss_timezone }}"

@@ -1,0 +1,18 @@
+---
+# tinytinyrss_app_version: Docker tag of the tinytinyrss app image to use
+tinytinyrss_app_version: latest
+
+# tinytinyrss_db_password: password for the postgres database 
+#tinytinyrss_db_password: <REQUIRED>
+
+# tinytinyrss_nginx_version: Docker tag of the ttrss-web-nginx image to use
+tinytinyrss_nginx_version: latest
+
+# tinytinyrss_postgres_version: Docker tag of the postgres image to use for ttrss [15-alpine]
+tinytinyrss_postgres_version: 15-alpine
+
+# tinytinyrss_self_url: external tt-rss URL as seen in your browser [https://feeds.pegasuspad.com]
+tinytinyrss_self_url: https://ttrss.pegasuspad.com
+
+# tinytinyrss_uid: uid/gid for the tinytinyrss user
+tinytinyrss_uid: 42100

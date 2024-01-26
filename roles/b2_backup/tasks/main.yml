@@ -1,0 +1,41 @@
+---
+- name: Install rclone
+  ansible.builtin.import_role:
+    name: stefangweichinger.ansible_rclone
+  vars:
+    rclone_configs:
+      - name: b2-backup
+        properties:
+          type: b2
+          account: "{{ b2_backup_account }}"
+          key: "{{ b2_backup_key }}"
+
+- name: Copy scripts
+  become: true
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: /usr/local/bin
+    owner: root
+    group: root
+    mode: "0755"
+  with_fileglob:
+    - "../templates/usr/local/bin/*"
+
+# configure daily remote backups
+- name: "Perform daily remote backups"
+  become: true
+  ansible.builtin.cron:
+    hour: "7"
+    job: /usr/local/bin/upload-to-b2.sh >>{{ b2_backup_logfile }} 2>&1
+    minute: "19"
+    name: "daily remote backup"
+    state: present
+    user: "{{ b2_backup_user | default(omit) }}"
+- name: Create logrotate entry for {{ b2_backup_logfile }}
+  become: true
+  ansible.builtin.template:
+    dest: /etc/logrotate.d/b2-backup
+    group: root
+    mode: "0644"
+    owner: root
+    src: etc/logrotate.d/b2-backup.j2

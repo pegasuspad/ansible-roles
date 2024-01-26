@@ -1,0 +1,9 @@
+---
+# gitea_db_password: password for the postgres database 
+#gitea_db_password: <REQUIRED>
+
+# gitea_image_version: Docker tag of the gitea image to use
+gitea_image_version: 1-rootless
+
+# gitea_uid: uid/gid for the gitea user
+gitea_uid: 21001

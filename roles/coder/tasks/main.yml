@@ -1,0 +1,64 @@
+# See: https://serverfault.com/a/1011758
+
+- name: Get docker gid
+  ansible.builtin.getent:
+    database: group
+    key: docker
+
+- name: Create network for 'coder' containers
+  community.docker.docker_network:
+    attachable: "true"
+    name: network_coder
+
+- name: Deploy Coder containers
+  tags: [coder, deploy, coder_deploy]
+  block:
+    - name: Deploy postgresql docker container
+      ansible.builtin.import_role:
+        name: postgres
+      vars:
+        postgres_db_name: coder
+        postgres_db_password: "{{ coder_db_password }}"
+        postgres_image_version: "{{ coder_db_image_version }}"
+        postgres_network:
+          name: network_coder
+          aliases:
+            - db
+        postgres_service_state: "{{ coder_service_state }}"
+        postgres_uid: "{{ coder_uid }}"
+    - name: Deploy coderd container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env:
+          CODER_ACCESS_URL: https://{{ coder_host }}
+          CODER_DISABLE_OWNER_WORKSPACE_ACCESS: "true"
+          CODER_DISABLE_PASSWORD_AUTH: "true"
+          CODER_HTTP_ADDRESS: 0.0.0.0:3000
+          CODER_OAUTH2_GITHUB_ALLOW_SIGNUPS: "true"
+          CODER_OAUTH2_GITHUB_ALLOWED_ORGS: "{{ coder_github_org }}"
+          CODER_OAUTH2_GITHUB_CLIENT_ID: "{{ coder_github_client_id }}"
+          CODER_OAUTH2_GITHUB_CLIENT_SECRET: "{{ coder_github_client_secret }}"
+          # format is due to a bug in urlencode filter
+          # See: https://github.com/ansible/ansible/issues/73054#issuecomment-1189553097
+          CODER_PG_CONNECTION_URL: postgresql://coder:{{ "{}".format(coder_db_password) | urlencode }}@db:5432/coder?sslmode=disable
+          CODER_SECURE_AUTH_COOKIE: "true"
+          CODER_TELEMETRY_ENABLED: "false"
+          CODER_UPDATE_CHECK: "true"
+          CODER_WILDCARD_ACCESS_URL: "*.{{ coder_host }}"
+        exposed_ports:
+          - "3000"
+        groups:
+          - "{{ getent_group.docker[1] }}"
+        image: ghcr.io/coder/coder:latest
+        name: coderd
+        networks:
+          - name: network_coder
+            aliases:
+              - coderd
+        published_ports:
+          - 3000:3000
+        restart_policy: always
+        state: "{{ coder_service_state }}"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock

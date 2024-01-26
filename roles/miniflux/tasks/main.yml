@@ -1,0 +1,62 @@
+# See: https://serverfault.com/a/1011758
+
+- name: Create miniflux configuration
+  block:
+    - name: Create miniflux directory
+      ansible.builtin.file:
+        group: "{{ miniflux_uid }}"
+        mode: "0555"
+        owner: "{{ miniflux_uid }}"
+        path: /etc/miniflux
+        state: directory
+    # - name: Copy gitea configuration
+    #   ansible.builtin.template:
+    #     dest: /etc/gitea/app.ini
+    #     group: "{{ gitea_uid }}"
+    #     owner: "{{ gitea_uid }}"
+    #     mode: "0440"
+    #     src: "etc/gitea/app.ini.j2"
+
+- name: Create network for 'miniflux' containers
+  community.docker.docker_network:
+    attachable: "true"
+    name: network_miniflux
+
+- name: Deploy miniflux containers
+  block:
+    - name: Deploy postgresql docker container
+      ansible.builtin.import_role:
+        name: postgres
+      vars:
+        postgres_db_name: miniflux
+        postgres_db_password: "{{ miniflux_db_password }}"
+        postgres_image_version: "{{ miniflux_postgres_version }}"
+        postgres_network:
+          name: network_miniflux
+          aliases:
+            - db
+        postgres_uid: "{{ miniflux_uid }}"
+    - name: Deploy app container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env:
+          BASE_URL: https://feeds.pegasuspad.com/
+          CREATE_ADMIN: "0"
+          DATABASE_URL: postgres://miniflux:{{ miniflux_db_password }}@db/miniflux?sslmode=disable
+          RUN_MIGRATIONS: "1"
+        exposed_ports:
+          - "8080"
+        image: miniflux/miniflux:{{ miniflux_image_version }}
+        name: miniflux
+        networks:
+          - name: network_miniflux
+            aliases:
+              - app
+        published_ports:
+          - 80:8080
+        restart_policy: always
+        state: started
+        volumes:
+          - /etc/localtime:/etc/localtime:ro
+          - /etc/timezone:/etc/timezone:ro

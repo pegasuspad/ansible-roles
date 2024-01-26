@@ -1,0 +1,2 @@
+# docker_data_root: path in which Docker will store data [system default]
+#docker_data_root: <use default>

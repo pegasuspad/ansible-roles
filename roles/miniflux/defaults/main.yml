@@ -1,0 +1,12 @@
+---
+# miniflux_db_password: password for the postgres database 
+#miniflux_db_password: <REQUIRED>
+
+# miniflux_image_version: Docker tag of the miniflux image to use [latest]
+miniflux_image_version: latest
+
+# miniflux_postgres_version: Docker tag of the postgres image to use [16-alpine]
+miniflux_postgres_version: 16-alpine
+
+# miniflux_uid: uid/gid for the miniflux user
+miniflux_uid: 42100

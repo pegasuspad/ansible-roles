@@ -1,0 +1,146 @@
+- name: Verify PostgreSQL options are valid
+  block:
+    - name: Verify inputs are valid
+      ansible.builtin.assert:
+        that:
+          - postgres_db_name is defined
+          - postgres_db_password is defined
+          - postgres_image_version is defined
+          - postgres_volume is undefined or postgres_volume.type in ['local', 'nfs']
+    - name: Verify nfs volume options are valid
+      when: (postgres_volume.type | d('local')) == 'nfs'
+      ansible.builtin.assert:
+        fail_msg: Volume options are invalid for type "nfs".
+        that:
+          - postgres_volume.nfs_host is defined
+          - postgres_volume.nfs_path is defined
+    - name: Verify ssl options are valid, if enabled
+      when: postgres_ssl is defined and postgres_ssl.enabled | d(false)
+      ansible.builtin.assert:
+        that:
+          - postgres_ssl.crt is defined
+          - postgres_ssl.key is defined
+
+- name: Create configuration
+  block:
+  - name: Create config directory
+    ansible.builtin.file:
+      group: "{{ postgres_uid | default(omit) }}"
+      mode: "0755"
+      owner: "{{ postgres_uid | default(omit) }}"
+      path: /etc/postgresql/initdb.d
+      state: directory
+  - name: Copy configuration
+    ansible.builtin.template:
+      dest: /etc/postgresql/postgresql.conf
+      group: "{{ postgres_uid | default(omit) }}"
+      owner: "{{ postgres_uid | default(omit) }}"
+      mode: "0644"
+      src: etc/postgresql/postgresql.conf.j2
+  - name: Create init script
+    when: postgres_init_sql is defined
+    ansible.builtin.template:
+      dest: /etc/postgresql/initdb.d/00-init.sql
+      group: "{{ postgres_uid | default(omit) }}"
+      owner: "{{ postgres_uid | default(omit) }}"
+      mode: "0644"
+      src: etc/postgresql/initdb.d/00-init.sql.j2
+  - name: Create server.crt file
+    ansible.builtin.template:
+      dest: /etc/postgresql/server.crt
+      group: "{{ postgres_uid | default(omit) }}"
+      owner: "{{ postgres_uid | default(omit) }}"
+      mode: "0644"
+      src: etc/postgresql/server.crt.j2
+    when: postgres_ssl is defined and postgres_ssl.enabled | d(false)
+  - name: Create server.key file
+    ansible.builtin.template:
+      dest: /etc/postgresql/server.key
+      group: "{{ postgres_uid | default(omit) }}"
+      owner: "{{ postgres_uid | default(omit) }}"
+      mode: "0600"
+      src: etc/postgresql/server.key.j2
+    when: postgres_ssl is defined and postgres_ssl.enabled | d(false)
+
+- name: Get info for PostgreSQL data volume
+  community.docker.docker_volume_info:
+    name: postgresql-data
+  register: postgresql_data_volume
+
+- name: Create PostgreSQL data volume
+  when: not postgresql_data_volume.exists
+  block:
+    - name: Create local PostgreSQL data volume
+      community.docker.docker_volume:
+        driver: local
+        driver_options: >-
+          {{
+            {} if postgres_volume.type is undefined or postgres_volume.type == 'local'
+            else {
+              'device': ':' + postgres_volume.nfs_path,
+              'o': 'addr=' + postgres_volume.nfs_host + ',rw,actimeo=1800,hard,nconnect=16,nfsvers=3,noatime,proto=tcp',
+              'type': 'nfs'
+            }
+          }}
+        name: "postgresql-data"
+        recreate: never
+        state: present
+    - name: Fix volume permissions for non-root user
+      when: postgres_uid is defined and (postgres_volume.type is undefined or postgres_volume.type == 'local')
+      community.docker.docker_container:
+        command:
+          - 'sh'
+          - '-c'
+          - |
+            chown -R -v "{{ postgres_uid }}:{{ postgres_uid }}" /var/lib/postgresql/data
+        detach: false
+        image: alpine
+        name: postgresql-volume-init
+        mounts:
+          - no_copy: true
+            source: "postgresql-data"
+            target: /var/lib/postgresql/data
+            type: volume
+        output_logs: true
+        restart_policy: "no"
+        state: started
+    - name: Remove volume permissions fixup container
+      when: postgres_uid is defined and (postgres_volume.type is undefined or postgres_volume.type == 'local')
+      community.docker.docker_container:
+        name: postgresql-volume-init
+        state: absent
+
+- name: Start PostgreSQL container
+  community.docker.docker_container:
+    auto_remove: false
+    command: 
+      - -c 
+      - config_file=/etc/postgresql/postgresql.conf
+    detach: true
+    env:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: "{{ postgres_db_name}}"
+      POSTGRES_INITDB_ARGS: "{{ postgres_initdb_args }}"
+      POSTGRES_PASSWORD: "{{ postgres_db_password }}"
+      POSTGRES_USER: "{{ postgres_db_name }}"
+    exposed_ports:
+      - "5432"
+    image: "{{ postgres_image_name }}:{{ postgres_image_version }}"
+    log_driver: local
+    log_options:
+      max-size: 10m
+    mounts:
+      - no_copy: true
+        source: "postgresql-data"
+        target: /var/lib/postgresql/data
+        type: volume
+    name: postgresql
+    networks: "{{ postgres_network | default(false) | ternary([postgres_network], []) }}"
+    published_ports:
+      - 5432:5432
+    restart_policy: always
+    state: "{{ postgres_service_state }}"
+    user: "{{ postgres_uid | default(omit) }}"
+    volumes:
+      - /etc/postgresql:/etc/postgresql:ro
+      - /etc/postgresql/initdb.d:/docker-entrypoint-initdb.d

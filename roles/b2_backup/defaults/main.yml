@@ -1,0 +1,17 @@
+# b2_backup_account: Backblaze account which owns the B2 bucket
+# b2_backup_account: <required>
+
+# b2_backup_bucket: name of the destination B2 bucket
+#b2_backup_bucket: <required>
+
+# b2_backup_key: private key granting access to the B2 bucket
+#b2_backup_key: <required>
+
+# b2_backup_logfile: file in which backup logs are saved
+b2_backup_logfile: /var/log/backup.log
+
+# b2_backup_path: the local path to back up
+#b2_backup_path: <required>
+
+# b2_backup_user: user to run backups as [current user]
+#b2_backup_user: <current user>

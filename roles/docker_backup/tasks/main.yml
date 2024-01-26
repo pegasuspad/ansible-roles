@@ -1,0 +1,39 @@
+- name: Install restic via restic role
+  ansible.builtin.include_role:
+    name: restic
+  vars:
+    restic_repository:
+      password: "{{ docker_backup_repository_password }}"
+      path: "{{ docker_backup_repository }}"
+      type: local
+    restic_user: "{{ docker_backup_user | default(omit) }}"
+
+- name: Copy scripts
+  become: true
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: /usr/local/bin
+    owner: root
+    group: root
+    mode: "0755"
+  with_fileglob:
+    - "../templates/usr/local/bin/*"
+
+# configure hourly backups
+- name: "Perform hourly backups"
+  become: true
+  ansible.builtin.cron:
+    hour: "*"
+    job: /usr/local/bin/backup-all-volumes hourly >>{{ docker_backup_logfile }} 2>&1
+    minute: "59"
+    name: "hourly backup"
+    state: present
+    user: "{{ docker_backup_user | default(omit) }}"
+- name: Create logrotate entry for {{ docker_backup_logfile }}
+  become: true
+  ansible.builtin.template:
+    dest: /etc/logrotate.d/docker-backup
+    group: root
+    mode: "0644"
+    owner: root
+    src: etc/logrotate.d/docker-backup.j2

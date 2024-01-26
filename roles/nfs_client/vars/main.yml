@@ -1,0 +1,2 @@
+# __nfs_client_mounts_default_options: default NFS mount options if not specified
+__nfs_client_mounts_default_options: actimeo=1800,auto,nconnect=16,nfsvers=3,noatime,noexec,nofail,nosuid,proto=tcp,_netdev

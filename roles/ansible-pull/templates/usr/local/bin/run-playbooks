@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -e
+
+sleepTime="${ANSIBLE_PULL_SLEEP_TIME:-0}"
+
+if [ -f /var/ansible/git-ref ]; then
+  gitRef=$(cat /var/ansible/git-ref)
+else
+  gitRef=main
+fi
+
+set +e
+
+/usr/bin/ansible-pull \
+  --checkout "${gitRef}" \
+  --inventory inventory \
+  --purge \
+  --sleep "${sleepTime}" \
+  --url https://git.pegasuspad.com/pegasuspad/ansible.git \
+  --vault-password-file "{{ ansible_secret_path }}" \
+  "$@" >>/var/log/ansible.log 2>&1
+
+result="$?"
+if [ $result != "0" ]; then
+  tail -100 /var/log/ansible.log
+  echo "Playbook failed! See /var/log/ansible.log for details."
+  exit 1
+fi

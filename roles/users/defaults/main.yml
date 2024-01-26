@@ -1,0 +1,21 @@
+---
+# users_extra: Configuration information for additional users to manage. (Default: no users)
+# users_extra.create_home: Whether a home directory will be made for the user. [false for system users, true for others]
+# users_extra.groups: List of groups to add the user to. Their personal group is always inclued (Default: pwersonal group only)
+# users_extra.shell: Shell to user for the user. [/bin/false for system users, /bin/bash for others]
+# users_extra.system: Setting this to true makes the user a system account. [false]
+# users_extra.uid: Optional UID for the new user. (Default: assign automatically)
+# users_extra.username: Name of the user to manage
+users_extra: []
+
+# users_default_user: Configuration information for the default user. (Default: no default)
+# users_default_user.groups: List of groups to add the user to. Their personal group is always inclued (Default: pwersonal group only)
+# users_default_user.shell: Shell to user for the user. [/bin/false for system users, /bin/bash for others]
+# users_default_user.uid: Optional UID for the new user. (Default: assign automatically)
+# users_default_user.username: Name of the user to manage
+users_default_user:
+  groups:
+    - adm
+    - sudo
+  uid: 60000
+  username: sean

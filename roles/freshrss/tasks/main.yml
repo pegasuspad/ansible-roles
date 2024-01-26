@@ -1,0 +1,167 @@
+- name: Create FreshRSS configuration
+  block:
+    - name: Create /etc/freshrss directory
+      ansible.builtin.file:
+        group: root
+        mode: "0555"
+        owner: root
+        path: /etc/freshrss
+        state: directory
+    - name: Copy config files
+      ansible.builtin.template:
+        dest: /etc/freshrss
+        group: root
+        mode: "0444"
+        owner: root
+        src: "{{ item }}"
+      with_fileglob:
+        - "../templates/etc/freshrss/*"
+
+- name: Create network for 'freshrss' containers
+  community.docker.docker_network:
+    attachable: "true"
+    name: network_freshrss
+
+- name: Get info for freshrss data volume
+  community.docker.docker_volume_info:
+    name: freshrss-data
+  register: freshrss_data_volume
+
+- name: Create freshrss data volume
+  when: not freshrss_data_volume.exists
+  block:
+    - name: Create freshrss data volume
+      community.docker.docker_volume:
+        driver: local
+        name: "freshrss-data"
+        recreate: never
+        state: present
+
+- name: Get info for freshrss extensions volume
+  community.docker.docker_volume_info:
+    name: freshrss-extensions
+  register: freshrss_extensions_volume
+
+- name: Create freshrss extensions volume
+  when: not freshrss_extensions_volume.exists
+  block:
+    - name: Create freshrss extensions volume
+      community.docker.docker_volume:
+        driver: local
+        name: "freshrss-extensions"
+        recreate: never
+        state: present
+
+- name: Deploy freshrss containers
+  block:
+    - name: Deploy postgresql container
+      ansible.builtin.import_role:
+        name: postgres
+      vars:
+        postgres_db_name: freshrss
+        postgres_db_password: "{{ freshrss_db_password }}"
+        postgres_image_version: "{{ freshrss_postgres_version }}"
+        postgres_network:
+          name: network_freshrss
+          aliases:
+            - db
+    - name: Deploy app container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        env:
+          CRON_MIN: 1,31
+          SERVER_DNS: "{{ freshrss_hostname }}"
+          TZ: "{{ freshrss_timezone }}"
+        exposed_ports:
+          - "80"
+        image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
+        log_driver: local
+        log_options:
+          max-size: 10m
+        mounts:
+          - no_copy: true
+            source: "freshrss-data"
+            target: /var/www/FreshRSS/data
+            type: volume
+          - no_copy: true
+            source: "freshrss-extensions"
+            target: /var/www/FreshRSS/extensions
+            type: volume
+        name: freshrss-app
+        networks:
+          - name: network_freshrss
+            aliases:
+              - app
+        published_ports:
+          - "{{ freshrss_port }}:80"
+        restart_policy: always
+        state: started
+        volumes:
+          # File providing custom global settings (used before a FreshRSS install)
+          - /etc/freshrss/config.custom.php:/var/www/FreshRSS/data/config.custom.php
+          # File providing custom user settings (used before a new user is created)
+          - /etc/freshrss/config-user.custom.php:/var/www/FreshRSS/data/config-user.custom.php
+    - name: Deploy Readability.js container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        image: "{{ freshrss_readability_image_name }}:{{ freshrss_readability_image_version }}"
+        log_driver: local
+        log_options:
+          max-size: 10m
+        name: freshrss-readability
+        networks:
+          - name: network_freshrss
+            aliases:
+              - readability
+        restart_policy: always
+        state: started
+    - name: Deploy Mercury container
+      community.docker.docker_container:
+        auto_remove: false
+        detach: true
+        image: "{{ freshrss_mercury_image_name }}:{{ freshrss_mercury_image_version }}"
+        log_driver: local
+        log_options:
+          max-size: 10m
+        name: freshrss-mercury
+        networks:
+          - name: network_freshrss
+            aliases:
+              - mercury
+        restart_policy: always
+        state: started
+    # - name: Deploy cron container
+    #   community.docker.docker_container:
+    #     auto_remove: false
+    #     command:
+    #       - cron
+    #       - -f
+    #     detach: true
+    #     env:
+    #       CRON_MIN: 17,47
+    #       TZ: "{{ freshrss_timezone }}"
+    #     image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
+    #     log_driver: local
+    #     log_options:
+    #       max-size: 10m
+    #     mounts:
+    #       - no_copy: true
+    #         source: "freshrss-data"
+    #         target: /var/www/FreshRSS/data
+    #         type: volume
+    #       - no_copy: true
+    #         source: "freshrss-extensions"
+    #         target: /var/www/FreshRSS/extensions
+    #         type: volume
+    #     name: freshrss-cron
+    #     networks:
+    #       - name: network_freshrss
+    #     restart_policy: always
+    #     state: absent
+    #     volumes:
+    #       # File providing custom global settings (used before a FreshRSS install)
+    #       - /etc/freshrss/config.custom.php:/var/www/FreshRSS/data/config.custom.php
+    #       # File providing custom user settings (used before a new user is created)
+    #       - /etc/freshrss/config-user.custom.php:/var/www/FreshRSS/data/config-user.custom.php

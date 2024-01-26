@@ -1,0 +1,39 @@
+---
+- name: Install Docker
+  tags: [docker, install, docker_install]
+  block:
+    - name: Install python libraries
+      ansible.builtin.import_role:
+        name: geerlingguy.pip
+      vars:
+        pip_install_packages:
+          - name: docker
+    - name: Create Docker data root
+      when: docker_data_root is defined
+      ansible.builtin.file:
+        mode: '0710'
+        owner: root
+        group: root
+        path: '{{ docker_data_root }}'
+        state: directory
+    - name: Install and configure Docker packages
+      ansible.builtin.import_role:
+        name: geerlingguy.docker
+      vars:
+        docker_daemon_options: "{{ {'data-root': docker_data_root} if docker_data_root is defined else {} }}"
+        docker_edition: "ce"
+        docker_install_compose_plugin: false
+        docker_install_compose: false
+        docker_packages_state: present
+        docker_restart_handler_state: restarted
+        docker_service_enabled: true
+        docker_service_manage: true
+        docker_service_state: started
+    - name: Remove default Docker data root, if needed
+      when: docker_data_root is defined and docker_data_root is not match('/var/lib/docker')
+      ansible.builtin.file:
+        path: /var/lib/docker
+        state: absent
+    - name: Install and configure Docker volume backup scripts
+      ansible.builtin.import_role:
+        name: docker_backup

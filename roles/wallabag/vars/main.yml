@@ -1,0 +1,5 @@
+# format is due to a bug in urlencode filter
+# See: https://github.com/ansible/ansible/issues/73054#issuecomment-1189553097
+
+# __wallabag_mailer_dsn: email sender dsn
+__wallabag_mailer_dsn: smtp://{{ "{}".format(wallabag_mail.username) | urlencode }}:{{ "{}".format(wallabag_mail.password) | urlencode }}@{{ wallabag_mail.smtp_host }}:{{ wallabag_mail.smtp_port }}
