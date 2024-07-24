@@ -20,11 +20,19 @@
 - name: Configure php
   tags: [php, configure, php_configure]
   block:
-    # TODO: only configure and restart apache if it's installed..
+    - name: Ensure php-fpm config directory
+      ansible.builtin.file:
+        group: root
+        mode: "0644"
+        owner: root
+        path: "/etc/php/{{ php_version }}/fpm/conf.d"
+        state: directory
     - name: "Create configuration: {{ item }}"
       loop:
+          # TODO: only configure and restart apache if it's installed..
         - /etc/php/{{ php_version }}/apache2/conf.d
         - /etc/php/{{ php_version }}/cli/conf.d
+          # TODO: only configure fpm if it's installed..
         - /etc/php/{{ php_version }}/fpm/conf.d
       notify: restart apache
       ansible.builtin.template:
