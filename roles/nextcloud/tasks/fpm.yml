@@ -5,6 +5,13 @@
     state: present
 
 # configure php-fpm pool configuration
+- name: Ensure php-fpm pool config directory
+  ansible.builtin.file:
+    group: root
+    mode: "0644"
+    owner: root
+    path: "/etc/php/{{ php_version }}/fpm/pool.d"
+    state: directory
 - name: Create php-fpm pool configuration
   become: true
   ansible.builtin.template:
