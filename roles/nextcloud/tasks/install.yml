@@ -1,0 +1,141 @@
+---
+- name: Install utilities needed for installation
+  ansible.builtin.apt:
+    pkg: bzip2
+    state: present
+
+- name: Install extra packages
+  ansible.builtin.apt:
+    pkg: "{{ __nextcloud_static_packages + nextcloud_extra_packages }}"
+    state: present
+
+# download and unarchive distribution
+- name: "Download nextcloud v{{ nextcloud_version }}"
+  vars:
+    checksum: "sha256:{{ __nextcloud_digest_url }}"
+    directory: "{{ __nextcloud_paths.work }}"
+    filename: "nextcloud-{{ nextcloud_version }}.tar.bz2"
+    mode: "0755"
+    url: "{{ __nextcloud_download_url }}"
+  ansible.builtin.include_role:
+    name: fetch
+    tasks_from: download.yml
+- name: Ensure current version directory exists
+  ansible.builtin.file:
+    group: www-data
+    mode: "0755"
+    owner: www-data
+    path: "{{ __nextcloud_current_version_path }}"
+    state: directory
+- name: Unarchive nextcloud
+  ansible.builtin.unarchive:
+    creates: "{{ __nextcloud_current_version_path }}/index.php"
+    dest: "{{ __nextcloud_current_version_path }}"
+    exclude:
+      - nextcloud/config
+    extra_opts: [--strip-components=1]
+    group: www-data
+    mode: "0755"
+    owner: www-data
+    remote_src: true
+    src: "{{ __nextcloud_paths.work }}/nextcloud-{{ nextcloud_version }}.tar.bz2"
+
+# set permissions to allow webserver access to nextcloud files
+- name: Create content and config directories
+  ansible.builtin.file:
+    group: www-data
+    mode: "0770"
+    owner: www-data
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  loop:
+    - "{{ __nextcloud_paths.apps }}"
+    - "{{ __nextcloud_paths.config }}"
+    - "{{ __nextcloud_paths.files }}"
+- name: Give webserver write permissions to .htaccess
+  ansible.builtin.file:
+    group: www-data
+    mode: "0770"
+    owner: www-data
+    path: "{{ __nextcloud_document_root }}/.htaccess"
+    state: file
+
+# create symlink to nextcloud config
+- name: Create symlinks to config for new version
+  ansible.builtin.file:
+    dest: "{{ __nextcloud_current_version_path }}/config"
+    src: "{{ __nextcloud_paths.config }}"
+    state: link
+# create symlink to external apps config
+- name: Create a symbolic link
+  ansible.builtin.file:
+    dest: "{{ __nextcloud_document_root }}/apps-custom"
+    src: "{{ __nextcloud_paths.apps }}"
+    state: link
+
+- name: Enable thumbnail generation for PDF files
+  block:
+    # @todo - will fail with different ImageMagick versions
+    - name: Enable PDF in ImageMagick policy
+      ansible.builtin.replace:
+        path: /etc/ImageMagick-6/policy.xml
+        regexp: '<policy domain="coder" rights="none" pattern="PDF" />'
+        replace: '<policy domain="coder" rights="read|write" pattern="PDF" />'
+      notify: restart apache
+    - name: Enable PS in ImageMagick policy
+      ansible.builtin.replace:
+        path: /etc/ImageMagick-6/policy.xml
+        regexp: '<policy domain="coder" rights="none" pattern="PS" />'
+        replace: '<policy domain="coder" rights="read|write" pattern="PS" />'
+      notify: restart apache
+    - name: Enable PS2 in ImageMagick policy
+      ansible.builtin.replace:
+        path: /etc/ImageMagick-6/policy.xml
+        regexp: '<policy domain="coder" rights="none" pattern="PS2" />'
+        replace: '<policy domain="coder" rights="read|write" pattern="PS2" />'
+      notify: restart apache
+    - name: Enable PS3 in ImageMagick policy
+      ansible.builtin.replace:
+        path: /etc/ImageMagick-6/policy.xml
+        regexp: '<policy domain="coder" rights="none" pattern="PS3" />'
+        replace: '<policy domain="coder" rights="read|write" pattern="PS3" />'
+      notify: restart apache
+    - name: Enable EPS in ImageMagick policy
+      ansible.builtin.replace:
+        path: /etc/ImageMagick-6/policy.xml
+        regexp: '<policy domain="coder" rights="none" pattern="EPS" />'
+        replace: '<policy domain="coder" rights="read|write" pattern="EPS" />'
+      notify: restart apache
+    - name: Enable XPS in ImageMagick policy
+      ansible.builtin.replace:
+        path: /etc/ImageMagick-6/policy.xml
+        regexp: '<policy domain="coder" rights="none" pattern="XPS" />'
+        replace: '<policy domain="coder" rights="read|write" pattern="XPS" />'
+      notify: restart apache
+
+- name: Run nextcloud cron scripts every 5 minutes
+  become: true
+  ansible.builtin.cron:
+    job: "/bin/php -f {{ __nextcloud_current_version_path }}/cron.php >>{{ nextcloud_logfile }} 2>&1"
+    minute: "*/5"
+    name: "run nextcloud cron scripts"
+    state: present
+    user: "www-data"
+- name: Pre-generate image previews every 10 minutes
+  become: true
+  ansible.builtin.cron:
+    job: "/bin/php -f {{ __nextcloud_current_version_path }}/occ preview:pre-generate >>{{ nextcloud_logfile }} 2>&1"
+    minute: "*/10"
+    name: "pre-generate image previews"
+    state: present
+    user: "www-data"
+
+- name: Create logrotate entry for nextcloud-log
+  become: true
+  ansible.builtin.template:
+    dest: /etc/logrotate.d/nextcloud-log
+    group: root
+    mode: "0644"
+    owner: root
+    src: etc/logrotate.d/nextcloud-log.j2

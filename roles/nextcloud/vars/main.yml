@@ -56,6 +56,7 @@ __nextcloud_php_packages:
   - php-intl=2:{{ php_version }}*
   - php-mbstring=2:{{ php_version }}*
   - php-mysql=2:{{ php_version }}*
+  - php-sqlite3=2:{{ php_version }}*
   - php-xml=2:{{ php_version }}*
   - php-zip=2:{{ php_version }}*
 

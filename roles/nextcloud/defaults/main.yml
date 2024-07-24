@@ -7,6 +7,8 @@ nextcloud_backup_user: nextcloud
 # nextcloud_backup_group: Name of the group who will be granted ownerships of data backups. ["nextcloud"]
 nextcloud_backup_group: nextcloud
 
+# database configuration
+# nextcloud_db_root_password:
 
 # nextcloud_admin: Initial credentials for the admin account. [provide during one-time setup]
 # nextcloud_admin.password: Initial password for the nextcloud admin account.
@@ -25,12 +27,16 @@ nextcloud_backup_group: nextcloud
 # nextcloud_db.password: Password to use when connecting to the database.
 # nextcloud_db.port: Port number to use when connecting to the database. [default is driver specific]
 # nextcloud_db.table_prefix: Prefix for the Nextcloud tables in the database. ["oc"]
-# nextcloud_db.type: Type of database (mysql, pgsql, sqlite3). The corresponding PHP driver must be installed.
+# nextcloud_db.type: Type of database (mysql, pgsql, sqlite3). The corresponding PHP driver must be installed. ["sqlite3"]
 # nextcloud_db.username: Username to use when connecting to the database.
-# nextcloud_db:
+nextcloud_db:
+  name: nextcloud
+  type: sqlite3
 
 # nextcloud_extra_packages: Additional packages to install, which are typically dependencies for apps. []
 nextcloud_extra_packages: []
+
+# nextcloud_host_name: DNS name for the nextcloud server, used to set "trusted_domains" option. []
 
 nextcloud_imagick_version: "3.7"
 nextcloud_libmagickcore_extra_version: "6.9"
@@ -40,6 +46,8 @@ nextcloud_maintenance_mode: false
 
 # nextcloud_path: Root filesystem path to use for nextcloud resources. ["/var/lib/nextcloud"]
 nextcloud_path: /var/lib/nextcloud
+
+# nextcloud_proxy_host: CIDR address for reverse proxy, used to set "trusted_proxies" option. []
 
 # nextcloud_mail: Configuration options for Nextcloud notifications and password resets. Either 'null' or a dictionary of options. [null]
 # nextcloud_mail.domain: Domain to use when sending mail. [Nextcloud application domain]

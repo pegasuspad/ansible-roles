@@ -1,0 +1,8 @@
+---
+- name: Install Nextcloud
+  tags: [nextcloud, install, nextcloud_install]
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure Nextcloud
+  tags: [nextcloud, configure, nextcloud_configure]
+  ansible.builtin.import_tasks: configure.yml
