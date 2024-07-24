@@ -1,0 +1,36 @@
+---
+- name: Verify inputs are valid
+  ansible.builtin.assert:
+    that:
+      - name is defined
+      - template is defined
+      - state == 'absent' or state == 'disabled' or state == 'enabled'
+
+- name: "Disable conf: {{ name }}"
+  args:
+    removes: "/etc/apache2/conf-enabled/{{ name }}.conf"
+  ansible.builtin.command: "a2disconf {{ name }}"
+  notify: Reload apache
+  when: state == 'absent' or state == 'disabled'
+
+- name: "Remove conf configuration: {{ name }}"
+  when: state == 'absent'
+  ansible.builtin.file:
+    path: "/etc/apache2/conf-available/{{ name }}.conf"
+    state: absent
+- name: "Update conf configuration: {{ name }}"
+  notify: Reload apache
+  when: state == 'disabled' or state == 'enabled'
+  ansible.builtin.template:
+    src: "{{ template }}"
+    dest: "/etc/apache2/conf-available/{{ name }}.conf"
+    group: root
+    mode: "0644"
+    owner: root
+
+- name: "Enable conf: {{ name }}"
+  args:
+    creates: "/etc/apache2/conf-enabled/{{ name }}.conf"
+  notify: Reload apache
+  when: state == 'enabled'
+  ansible.builtin.command: "a2enconf {{ name }}"

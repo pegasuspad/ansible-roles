@@ -1,0 +1,51 @@
+---
+- name: Install Apache
+  tags: [apache, install, apache_install]
+  block:
+    - name: Install apache packages
+      ansible.builtin.import_role:
+        name: geerlingguy.apache
+      vars:
+        apache_packages:
+          - apache2={{ apache2_version }}
+          - apache2-utils={{ apache2_version }}
+        apache_remove_default_vhost: true
+    # - name: Hold apache packages from automatic upgrades
+    #   ansible.builtin.dpkg_selections:
+    #     name: "{{ item }}"
+    #     selection: hold
+    #   loop:
+    #     - apache2
+    #     - apache2-utils
+
+- name: Configure Apache
+  tags: [apache, configure, apache_configure]
+  block:
+    - name: "Create core dumps folder"
+      when: apache_coredump_enabled
+      ansible.builtin.file:
+        group: www-data
+        mode: "0770"
+        owner: root
+        path: "{{ apache_coredump_directory }}"
+        state: directory
+    - name: "Manage configuration"
+      vars:
+        name: "enable-core-dumps"
+        template: "etc/apache2/conf-available/enable-core-dumps.conf.j2"
+        state: "{{ apache_coredump_enabled | bool | ternary('enabled', 'disabled') }}"
+      ansible.builtin.include_tasks:
+        file: _manage_conf.yml
+    - name: "Manage modules"
+      community.general.apache2_module:
+        name: "{{ item.name }}"
+        state: "{{ item.state | default('present') }}"
+      loop: "{{ apache_modules }}"
+    - name: "Manage sites"
+      loop: "{{ apache_sites }}"
+      vars:
+        name: "{{ item.name }}"
+        template: "{{ item.template }}"
+        state: "{{ item.state | default('enabled') }}"
+      ansible.builtin.include_tasks:
+        file: _manage_site.yml

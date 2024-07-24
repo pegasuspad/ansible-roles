@@ -1,0 +1,35 @@
+---
+- name: Install php
+  tags: [php, install, php_install]
+  block:
+    - name: Add ppa:ondrej/php repository
+      ansible.builtin.apt_repository:
+        repo: "ppa:ondrej/php"
+        state: present
+    - name: Install php packages
+      ansible.builtin.apt:
+        pkg: "{{ __php_static_packages + php_packages }}"
+        state: present
+    # disable holding packages, because the way it's used here is causing ansible to fail
+    # - name: Hold php packages from automatic upgrades
+    #   ansible.builtin.dpkg_selections:
+    #     name: "{{ item }}"
+    #     selection: hold
+    #   loop: "{{ (__php_static_packages + php_packages) | map('regex_replace', '=.+', '') | list }}"
+
+- name: Configure php
+  tags: [php, configure, php_configure]
+  block:
+    # TODO: only configure and restart apache if it's installed..
+    - name: "Create configuration: {{ item }}"
+      loop:
+        - /etc/php/8.2/apache2/conf.d
+        - /etc/php/8.2/cli/conf.d
+        - /etc/php/8.2/fpm/conf.d
+      notify: restart apache
+      ansible.builtin.template:
+        dest: "{{ item }}/50-local.ini"
+        group: root
+        mode: "0744"
+        owner: root
+        src: php.ini.j2
