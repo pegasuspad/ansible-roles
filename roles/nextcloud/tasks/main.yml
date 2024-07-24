@@ -11,3 +11,8 @@
   tags: [nextcloud]
   ansible.builtin.import_tasks: fpm.yml
   when: nextcloud_use_fpm
+
+- name: Configure backups
+  tags: [nextcloud]
+  ansible.builtin.import_tasks: backup.yml
+  when: nextcloud_backup_enabled

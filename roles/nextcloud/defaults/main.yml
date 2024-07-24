@@ -2,24 +2,25 @@
 # name of the log file that should contain backup process logs. ["/var/log/nextcloud.log"]
 nextcloud_logfile: /var/log/nextcloud.log
 
-# nextcloud_backup_user: Name of the user who will be granted ownerships of data backups. ["nextcloud"]
-nextcloud_backup_user: nextcloud
-# nextcloud_backup_group: Name of the group who will be granted ownerships of data backups. ["nextcloud"]
-nextcloud_backup_group: nextcloud
-
-# database configuration
-# nextcloud_db_root_password:
-
 # nextcloud_admin: Initial credentials for the admin account. [provide during one-time setup]
 # nextcloud_admin.password: Initial password for the nextcloud admin account.
 # nextcloud_admin.username: Initial username for the nextcloud admin account.
 # nextcloud_admin:
 
-# nextcloud_backup_path: Root directory in which to store backups. ["{{ nextcloud_path }}/backups."]
-# nextcloud_backup_path:
+# nextcloud_backup_enabled: Whether backups are enabled. [false]
+nextcloud_backup_enabled: false
+# nextcloud_backup.group: Name of the group who will be granted ownerships of data backups. ["nextcloud"]
+nextcloud_backup_group: nextcloud
+# nextcloud_backup.path: Root directory in which to store backups. ["{{ nextcloud_path }}/backups"]
+nextcloud_backup_path: "{{ nextcloud_path }}/backups"
+# nextcloud_backup.user: Name of the user who will be granted ownerships of data backups. ["nextcloud"]
+nextcloud_backup_user: nextcloud
 
 # nextcloud_data_path: Base path for instance-specific data (apps, config, and files). ["{{ nextcloud_path }}/data"]
 # nextcloud_data_path:
+
+# database configuration
+# nextcloud_db_root_password:
 
 # nextcloud_db: Initial database configuration. This is ignored after Nextcloud's one-time setup has been completed. [provide DB during one-time setup]
 # nextcloud_db.host: Database host server name.
