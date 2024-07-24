@@ -1,7 +1,7 @@
 ---
 - name: Install fpm package
   ansible.builtin.apt:
-    pkg: "{{ __nextcloud_php_package_fpm }}"
+    pkg: "{{ __nextcloud_php_packages.fpm }}"
     state: present
 
 # configure php-fpm pool configuration
