@@ -42,23 +42,24 @@ __nextcloud_paths:
   work: "{{ nextcloud_path }}/.work"
 
 __nextcloud_php_packages:
-  # needed for proper svg support
-  - libmagickcore-6.q16-6-extra=8:{{ nextcloud_libmagickcore_extra_version }}*
-  - php-apcu
-  - php-bcmath=2:{{ php_version }}*
-  - php-bz2=2:{{ php_version }}*
-  - php-cli=2:{{ php_version }}*
-  - php-curl=2:{{ php_version }}*
-  - php-fpm=2:{{ php_version }}*
-  - php-gd=2:{{ php_version }}*
-  - php-gmp=2:{{ php_version }}*
-  - php-imagick={{ nextcloud_imagick_version }}*
-  - php-intl=2:{{ php_version }}*
-  - php-mbstring=2:{{ php_version }}*
-  - php-mysql=2:{{ php_version }}*
-  - php-sqlite3=2:{{ php_version }}*
-  - php-xml=2:{{ php_version }}*
-  - php-zip=2:{{ php_version }}*
+  common:
+    # needed for proper svg support
+    - libmagickcore-6.q16-6-extra=8:{{ nextcloud_libmagickcore_extra_version }}*
+    - php-apcu
+    - php-bcmath=2:{{ php_version }}*
+    - php-bz2=2:{{ php_version }}*
+    - php-cli=2:{{ php_version }}*
+    - php-curl=2:{{ php_version }}*
+    - php-gd=2:{{ php_version }}*
+    - php-gmp=2:{{ php_version }}*
+    - php-imagick={{ nextcloud_imagick_version }}*
+    - php-intl=2:{{ php_version }}*
+    - php-mbstring=2:{{ php_version }}*
+    - php-xml=2:{{ php_version }}*
+    - php-zip=2:{{ php_version }}*
+  fpm: php-fpm=2:{{ php_version }}*
+  mysql: php-mysql=2:{{ php_version }}*
+  sqlite3: php-sqlite3=2:{{ php_version }}*
 
 # __nextcloud_rclone_configs: list of rclone configs to be installed; see https://github.com/stefangweichinger/ansible-rclone
 __nextcloud_rclone_configs:

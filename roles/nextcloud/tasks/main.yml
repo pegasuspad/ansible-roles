@@ -1,8 +1,13 @@
 ---
 - name: Install Nextcloud
-  tags: [nextcloud, install, nextcloud_install]
-  ansible.builtin.import_tasks: install.yml
+  tags: [nextcloud]
+  ansible.builtin.import_tasks: base_install.yml
 
 - name: Configure Nextcloud
-  tags: [nextcloud, configure, nextcloud_configure]
-  ansible.builtin.import_tasks: configure.yml
+  tags: [nextcloud]
+  ansible.builtin.import_tasks: base_configure.yml
+
+- name: Configure FPM
+  tags: [nextcloud]
+  ansible.builtin.import_tasks: fpm.yml
+  when: nextcloud_use_fpm

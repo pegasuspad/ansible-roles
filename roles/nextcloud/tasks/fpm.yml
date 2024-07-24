@@ -1,0 +1,16 @@
+---
+- name: Install fpm package
+  ansible.builtin.apt:
+    pkg: "{{ __nextcloud_php_package_fpm }}"
+    state: present
+
+# configure php-fpm pool configuration
+- name: Create php-fpm pool configuration
+  become: true
+  ansible.builtin.template:
+    dest: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
+    group: root
+    mode: "0644"
+    owner: root
+    src: etc/php/8.x/fpm/pool.d/www.conf.j2
+  notify: restart php-fpm

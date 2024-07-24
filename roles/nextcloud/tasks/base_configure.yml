@@ -83,6 +83,13 @@
         src: autoconfig.php.j2
 
 # apply additional configuration options
+- name: Add nextcloud mail settings
+  ansible.builtin.template:
+    src: mail.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/mail.config.php"
+    group: www-data
+    mode: "0640"
+    owner: www-data
 - name: Add app folder settings
   ansible.builtin.template:
     src: apps.config.php.j2
@@ -100,14 +107,3 @@
 - name: Add maintenance mode settings
   ansible.builtin.import_tasks:
     file: actions/set_maintenance_mode.yml
-
-# configure php-fpm pool configuration
-- name: Create php-fpm pool configuration
-  become: true
-  ansible.builtin.template:
-    dest: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
-    group: root
-    mode: "0644"
-    owner: root
-    src: etc/php{{ php_version }}/fpm/pool.d/www.conf.j2
-  notify: restart php-fpm
