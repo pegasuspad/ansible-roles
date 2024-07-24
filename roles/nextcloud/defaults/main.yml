@@ -65,5 +65,5 @@ nextcloud_path: /var/lib/nextcloud
 # nextcloud_use_fpm: whether to use PHP-FPM or not. [false]
 nextcloud_use_fpm: false
 
-# nextcloud_version: Version number of Nextcloud to install. ["27.1.11"]
-nextcloud_version: 27.1.11
+# nextcloud_version: Version number of Nextcloud to install. ["29.0.4"]
+nextcloud_version: 29.0.4
