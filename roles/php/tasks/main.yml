@@ -23,9 +23,9 @@
     # TODO: only configure and restart apache if it's installed..
     - name: "Create configuration: {{ item }}"
       loop:
-        - /etc/php/8.2/apache2/conf.d
-        - /etc/php/8.2/cli/conf.d
-        - /etc/php/8.2/fpm/conf.d
+        - /etc/php/{{ php_version }}/apache2/conf.d
+        - /etc/php/{{ php_version }}/cli/conf.d
+        - /etc/php/{{ php_version }}/fpm/conf.d
       notify: restart apache
       ansible.builtin.template:
         dest: "{{ item }}/50-local.ini"

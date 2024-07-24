@@ -32,8 +32,8 @@ nextcloud_backup_group: nextcloud
 # nextcloud_extra_packages: Additional packages to install, which are typically dependencies for apps. []
 nextcloud_extra_packages: []
 
-nextcloud_imagick_version: 3.7*
-nextcloud_libmagickcore_extra_version: 8:6.9*
+nextcloud_imagick_version: "3.7"
+nextcloud_libmagickcore_extra_version: "6.9"
 
 # nextcloud_maintenance_mode: whether the server should be in maintenance mode or not. [false]
 nextcloud_maintenance_mode: false
