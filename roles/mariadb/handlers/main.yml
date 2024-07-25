@@ -1,0 +1,5 @@
+---
+- name: Reload mysql
+  ansible.builtin.service:
+    name: mysql
+    state: reloaded
