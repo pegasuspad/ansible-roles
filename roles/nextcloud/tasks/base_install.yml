@@ -124,6 +124,14 @@
         replace: '<policy domain="coder" rights="read|write" pattern="XPS" />'
       notify: restart apache
 
+- name: Ensure nextcloud log file exists and has correct permissions
+  become: true
+  file:
+    group: www-data
+    mode: '0644'
+    owner: root
+    path: "{{ nextcloud_logfile }}"
+    state: touch
 - name: Run nextcloud cron scripts every 5 minutes
   become: true
   ansible.builtin.cron:
@@ -141,12 +149,11 @@
     state: present
     user: "www-data"
 
-
 - name: Create logrotate entry for nextcloud-log
   become: true
   ansible.builtin.template:
     dest: /etc/logrotate.d/nextcloud-log
-    group: root
-    mode: "0644"
+    group: www-data
+    mode: "0664"
     owner: root
     src: etc/logrotate.d/nextcloud-log.j2
