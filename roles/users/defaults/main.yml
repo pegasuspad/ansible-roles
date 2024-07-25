@@ -16,6 +16,7 @@ users_extra: []
 users_default_user:
   groups:
     - adm
+    - docker
     - sudo
   uid: 60000
   username: sean
