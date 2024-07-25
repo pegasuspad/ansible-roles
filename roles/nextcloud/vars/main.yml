@@ -44,7 +44,7 @@ __nextcloud_paths:
 __nextcloud_php_packages:
   common:
     # needed for proper svg support
-    - libmagickcore-6.q16-6-extra=8:{{ nextcloud_libmagickcore_extra_version }}*
+    # - libmagickcore-6.q16-6-extra=8:{{ nextcloud_libmagickcore_extra_version }}*
     - php{{ php_version }}-apcu
     - php{{ php_version }}-bcmath
     - php{{ php_version }}-bz2
@@ -52,7 +52,7 @@ __nextcloud_php_packages:
     - php{{ php_version }}-curl
     - php{{ php_version }}-gd
     - php{{ php_version }}-gmp
-    - php-imagick={{ nextcloud_imagick_version }}*
+    # - php-imagick={{ nextcloud_imagick_version }}*
     - php{{ php_version }}-intl
     - php{{ php_version }}-mbstring
     - php{{ php_version }}-xml
