@@ -127,7 +127,7 @@
   become: true
   file:
     group: www-data
-    mode: '0644'
+    mode: '0664'
     owner: root
     path: "{{ nextcloud_logfile }}"
     state: touch
