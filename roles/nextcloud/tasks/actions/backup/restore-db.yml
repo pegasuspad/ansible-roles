@@ -1,0 +1,29 @@
+---
+- name: (RESTORE) Calculate snapshot path
+  ansible.builtin.set_fact:
+    restore_destination: "{{ __nextcloud_paths.backup_restore }}/{{ nextcloud_snapshot_id }}"
+- name: (RESTORE) Check if database snapshot exists
+  ansible.builtin.stat:
+    path: "{{ restore_destination }}/db.sql.gz"
+  register: db_snapshot_path
+
+- name: (RESTORE) Extract snapshot, if missing
+  when: not db_snapshot_path.stat.exists
+  ansible.builtin.include_tasks:
+    file: actions/backup/download-snapshot.yml
+
+- name: (RESTORE) Enable maintenance mode
+  ansible.builtin.include_tasks:
+    file: actions/maintenance-mode-enable.yml
+
+- name: (RESTORE) Delete existing database
+  community.mysql.mysql_db:
+    name: "{{ nextcloud_db.name }}"
+    state: absent
+- name: (RESTORE) Restore database backup
+  community.mysql.mysql_db:
+    collation: "{{ __nextcloud_db_collation }}"
+    encoding: "{{ __nextcloud_db_encoding }}"
+    name: "{{ nextcloud_db.name }}"
+    state: import
+    target: "{{ restore_destination }}/db.sql.gz"
