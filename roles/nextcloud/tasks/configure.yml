@@ -1,6 +1,6 @@
 ---
 # verify supplied variables are valid
-- name: Verify initial db setup is valid
+- name: (CONFIGURE) Verify initial db setup is valid
   when: nextcloud_db is defined and nextcloud_db | d(false)
   block:
     - name: Validate no unexpected configuration keys
@@ -39,7 +39,7 @@
           - nextcloud_db.port is not defined
           - nextcloud_db.username is not defined
 
-- name: Verify required mail variables are set if mail is enabled
+- name: (CONFIGURE) Verify required mail variables are set if mail is enabled
   when: nextcloud_mail is defined and nextcloud_mail.enabled | default(true)
   ansible.builtin.assert:
     fail_msg: Specified nextcloud_mail configuration is invalid.
@@ -48,7 +48,7 @@
       - nextcloud_mail.smtp_auth is not defined or (nextcloud_mail.smtp_auth.username is defined and nextcloud_mail.smtp_auth.password is defined)
       - nextcloud_mail.keys() | difference(['domain', 'enabled', 'from_address', 'smtp_auth', 'smtp_host', 'smtp_port', 'smtp_use_tls']) == []
 
-- name: Verify both admin username and admin password are set if either is
+- name: (CONFIGURE) Verify both admin username and admin password are set if either is
   when: nextcloud_admin is defined
   ansible.builtin.assert:
     fail_msg: Specified nextcloud_admin configuration is invalid.
@@ -58,11 +58,11 @@
       - nextcloud_admin.username is defined
 
 # perform first-time setup if nextcloud isn't configured yet
-- name: Determine if nextcloud has been configured already
+- name: (CONFIGURE) Determine if nextcloud has been configured already
   ansible.builtin.stat:
     path: "{{ __nextcloud_config_file }}"
   register: nextcloud_config_stat
-- name: Prepare initial configuration if needed
+- name: (CONFIGURE) Create initial "AUTOCONF" settings if needed
   when: not nextcloud_config_stat.stat.exists
   block:
     - name: Create 'CAN_INSTALL' marker if needed
@@ -83,27 +83,38 @@
         src: autoconfig.php.j2
 
 # apply additional configuration options
-- name: Add nextcloud mail settings
-  ansible.builtin.template:
-    src: mail.config.php.j2
-    dest: "{{ __nextcloud_paths.config }}/mail.config.php"
-    group: www-data
-    mode: "0640"
-    owner: www-data
-- name: Add app folder settings
+- name: (CONFIGURE) Add app folder settings
   ansible.builtin.template:
     src: apps.config.php.j2
     dest: "{{ __nextcloud_paths.config }}/apps.config.php"
     group: www-data
     mode: "0640"
     owner: www-data
-- name: Copy additional nextcloud settings
+- name: (CONFIGURE) Add db settings
+  ansible.builtin.template:
+    src: db.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/db.config.php"
+    group: www-data
+    mode: "0640"
+    owner: www-data
+- name: (CONFIGURE) Add local settings
+  ansible.builtin.template:
+    src: local.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/local.config.php"
+    group: www-data
+    mode: "0640"
+    owner: www-data
+- name: (CONFIGURE) Add mail settings
+  ansible.builtin.template:
+    src: mail.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/mail.config.php"
+    group: www-data
+    mode: "0640"
+    owner: www-data
+- name: (CONFIGURE) Add additional nextcloud settings
   ansible.builtin.template:
     src: custom.config.php.j2
     dest: "{{ __nextcloud_paths.config }}/custom.config.php"
     group: www-data
     mode: "0640"
     owner: www-data
-- name: Add maintenance mode settings
-  ansible.builtin.import_tasks:
-    file: actions/set_maintenance_mode.yml

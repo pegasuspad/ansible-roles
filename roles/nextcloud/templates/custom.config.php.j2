@@ -22,14 +22,4 @@ $CONFIG = array (
   'memcache.local' => '\OC\Memcache\APCu',
   'preview_max_memory' => 4096,
   'preview_max_filesize_image' => 256,
-{% if nextcloud_host_name is defined %}
-  'trusted_domains' => array (
-    0 => '{{ nextcloud_host_name }}',
-  ),
-{% endif %}
-{% if nextcloud_proxy_host is defined %}
-  'trusted_proxies' => array (
-    0 => '{{ nextcloud_proxy_host }}',
-  ),
-{% endif %}
 );
