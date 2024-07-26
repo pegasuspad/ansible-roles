@@ -35,3 +35,4 @@
     dest: "{{ __nextcloud_paths.data }}"
     mode: push
     src: "{{ snapshot_files }}/"
+  delegate_to: "{{ inventory_hostname }}"
