@@ -1,11 +1,11 @@
 ---
 - name: Install Nextcloud
   tags: [nextcloud]
-  ansible.builtin.import_tasks: base_install.yml
+  ansible.builtin.import_tasks: install.yml
 
 - name: Configure Nextcloud
   tags: [nextcloud]
-  ansible.builtin.import_tasks: base_configure.yml
+  ansible.builtin.import_tasks: configure.yml
 
 - name: Configure FPM
   tags: [nextcloud]
