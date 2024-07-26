@@ -16,7 +16,7 @@
   block:
     - name: (RESTORE) Calculate restore temp path
       ansible.builtin.set_fact:
-      restore_temp_path: "{{ __nextcloud_paths.backup_temp }}/{{ timestamp }}"
+        restore_temp_path: "{{ __nextcloud_paths.backup_temp }}/{{ timestamp }}"
     - name: (RESTORE) Create restore temp directory
       ansible.builtin.file:
         group: root
