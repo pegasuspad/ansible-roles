@@ -12,9 +12,16 @@
   ansible.builtin.include_tasks:
     file: actions/backup/download-snapshot.yml
 
+# Config directory won't exist on fresh install, or if data directory was deleted
+# by a previously failed restore attempt. In this case, we skip setting maintenance mode.
+- name: (RESTORE) Check if nextcloud config directory exist
+  ansible.builtin.stat:
+    path: "{{ __nextcloud_paths.config }}"
+  register: config_path
 - name: (RESTORE) Enable maintenance mode
   ansible.builtin.include_tasks:
     file: actions/enable-maintenance-mode-with-autodisable.yml
+  when: config_path.stat.exists
 
 - name: (RESTORE) Remove existing data directory
   ansible.builtin.file:
