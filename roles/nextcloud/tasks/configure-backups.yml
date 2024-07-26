@@ -1,0 +1,42 @@
+# - name: Install backup and restore scripts
+#   ansible.builtin.copy:
+#     src: "{{ item }}"
+#     dest: /usr/local/bin
+#     owner: root
+#     group: root
+#     mode: "0744"
+#   with_fileglob:
+#     - "usr/local/bin/*"
+
+# - name: Perform nightly backups
+#   become: true
+#   ansible.builtin.cron:
+#     hour: "7" # 2am central
+#     job: /usr/local/bin/cronjob-lock /usr/local/bin/backup >>{{ nextcloud_logfile }} 2>&1
+#     minute: "2"
+#     name: "backup nextcloud nightly"
+#     state: present
+#     user: "root"
+
+- name: (BACKUP) Install and configure restic
+  ansible.builtin.include_role:
+    name: roles-ansible.restic
+    vars:
+      restic_backups:
+        backblaze:
+          name: backblaze
+          niceness: 10
+          repo: aws
+          scheduled: false
+          src: '{{ __nextcloud_paths.backup_temp }}'
+      restic_dir_group: '{{ __nextcloud_backup.grup }}'
+      restic_dir_owner: '{{ __nextcloud_backup.user }}'
+      restic_download_path: /opt/backup
+      restic_repos:
+        aws:
+          aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
+          aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
+          location: '{{ nextcloud_backup_repository.url }}'
+          password: '{{ __nextcloud_backup.repository.repository_password }}'
+          init: false
+      restic_script_dir: /opt/backup

@@ -7,12 +7,16 @@ nextcloud_logfile: /var/log/nextcloud.log
 # nextcloud_admin.username: Initial username for the nextcloud admin account.
 # nextcloud_admin:
 
+# nextcloud_backup_repository: secrets used to access the remote backup repository
+# nextcloud_backup_repository.b2_access_key_id:
+# nextcloud_backup_repository.b2_access_key_secret:
+# nextcloud_backup_repository.url
+# nextcloud_backup_repository.password: 
+
 # nextcloud_backup_enabled: Whether backups are enabled. [false]
 nextcloud_backup_enabled: false
 # nextcloud_backup.group: Name of the group who will be granted ownerships of data backups. ["nextcloud"]
 nextcloud_backup_group: nextcloud
-# nextcloud_backup.path: Root directory in which to store backups. ["{{ nextcloud_path }}/backups"]
-nextcloud_backup_path: "{{ nextcloud_path }}/backup"
 # nextcloud_backup.user: Name of the user who will be granted ownerships of data backups. ["nextcloud"]
 nextcloud_backup_user: nextcloud
 

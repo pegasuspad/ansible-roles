@@ -14,5 +14,5 @@
 
 - name: Configure backups
   tags: [nextcloud]
-  ansible.builtin.import_tasks: backup.yml
+  ansible.builtin.import_tasks: configure-backups.yml
   when: nextcloud_backup_enabled

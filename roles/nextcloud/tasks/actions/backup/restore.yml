@@ -1,0 +1,21 @@
+# Perform all the steps needed to restore the snapshot in "nextcloud_snapshot_id"
+
+- name: (RESTORE) Ensure a snapshot ID was specified
+  assert:
+    that:
+      - nextcloud_snapshot_id is defined
+      - nextcloud_snapshot_id | length > 0
+    msg: "The 'nextcloud_snapshot_id' variable must be set and non-empty."
+    
+- name: (RESTORE) Download snapshot - {{ nextcloud_snapshot_id }}
+  ansible.builtin.include_tasks:
+    file: actions/backup/download-snapshot.yml
+- name: (RESTORE) Restore database - {{ nextcloud_snapshot_id }}
+  ansible.builtin.include_tasks:
+    file: actions/backup/restore-db.yml
+- name: (RESTORE) Restore files - {{ nextcloud_snapshot_id }}
+  ansible.builtin.include_tasks:
+    file: actions/backup/restore-files.yml
+- name: (RESTORE) Update restored configuration
+  ansible.builtin.include_tasks:
+    file: configure.yml

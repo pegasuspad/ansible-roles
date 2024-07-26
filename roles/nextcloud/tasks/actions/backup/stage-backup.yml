@@ -1,0 +1,57 @@
+---
+- name: (BACKUP) Calculate backup staging path
+  ansible.builtin.set_fact:
+    backup_directory: "{{ __nextcloud_paths.backup_temp }}/staging"
+
+- name: (BACKUP) Remove existing staging directory - {{ backup_directory }}
+  ansible.builtin.file:
+    path: "{{ backup_directory }}"
+    state: absent
+
+- name: (BACKUP) Recreate staging data directory - {{ backup_directory }}
+  ansible.builtin.file:
+    group: "{{ nextcloud_backup_group }}"
+    mode: "0750"
+    owner: "{{ nextcloud_backup_user }}"
+    path: "{{ backup_directory }}/data"
+    state: directory
+
+- name: (BACKUP) Create unsafe staged backup, which will be resynced during maintenance mode
+  ansible.posix.synchronize:
+    archive: true
+    compress: true
+    delay_updates: false
+    delete: true
+    dest: "{{ backup_directory }}/data"
+    mode: push
+    src: "{{ __nextcloud_paths.data }}/"
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: (BACKUP) Finalize staged backup with any changes made during initial sync
+  block:
+    - name: (BACKUP) Enable maintenance mode
+      ansible.builtin.include_tasks:
+        file: actions/set-maintenance-mode.yml
+      vars:
+        nextcloud_maintenance_mode: true
+    - name: (BACKUP) Resync files to staging area
+      ansible.posix.synchronize:
+        archive: true
+        compress: true
+        delay_updates: false
+        delete: true
+        dest: "{{ backup_directory }}/data"
+        mode: push
+        src: "{{ __nextcloud_paths.data }}/"
+      delegate_to: "{{ inventory_hostname }}"
+    - name: (BACKUP) Create database backup
+      community.mysql.mysql_db:
+        name: "{{ nextcloud_db.name }}"
+        state: dump
+        target: "{{ backup_directory }}/db.sql.gz"
+  always:
+    - name: (BACKUP) Disable maintenance mode
+      ansible.builtin.include_tasks:
+        file: actions/set-maintenance-mode.yml
+      vars:
+        nextcloud_maintenance_mode: false
