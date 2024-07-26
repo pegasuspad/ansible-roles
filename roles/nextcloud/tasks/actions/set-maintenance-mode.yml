@@ -1,0 +1,27 @@
+---
+
+# Variables:
+#   - nextcloud_maintenance_mode: the mode to set, true or false
+#   - nextcloud_maintenance_mode_auto_disable: whether to automatically disable maintenance mode after the current play (false)
+
+- name: "Update maintenance.config.php (with auto-disable)"
+  ansible.builtin.template:
+    src: maintenance.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/maintenance.config.php"
+    group: www-data
+    mode: "0770"
+    owner: www-data
+  notify:
+    - disable maintenance mode 
+  when: nextcloud_maintenance_mode and (nextcloud_maintenance_mode_autodisable | d(false))
+
+- name: "Update maintenance.config.php"
+  ansible.builtin.template:
+    src: maintenance.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/maintenance.config.php"
+    group: www-data
+    mode: "0770"
+    owner: www-data
+  notify:
+    - disable maintenance mode 
+  when: not nextcloud_maintenance_mode or (nextcloud_maintenance_mode_autodisable | d(false))

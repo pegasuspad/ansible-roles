@@ -14,7 +14,10 @@
 
 - name: (RESTORE) Enable maintenance mode
   ansible.builtin.include_tasks:
-    file: actions/maintenance-mode-enable.yml
+    file: actions/set-maintenance-mode.yml
+  vars:
+    nextcloud_maintenance_mode: true
+    nextcloud_maintenance_mode_autodisable: true
 
 - name: (RESTORE) Remove existing data directory
   ansible.builtin.file:
