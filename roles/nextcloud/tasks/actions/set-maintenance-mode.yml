@@ -13,7 +13,7 @@
     owner: www-data
   notify:
     - disable maintenance mode 
-  when: nextcloud_maintenance_mode and (nextcloud_maintenance_mode_autodisable | d(false))
+  when: (nextcloud_maintenance_mode | bool) and (nextcloud_maintenance_mode_autodisable | d(false))
 
 - name: "Update maintenance.config.php"
   ansible.builtin.template:
@@ -24,4 +24,4 @@
     owner: www-data
   notify:
     - disable maintenance mode 
-  when: not nextcloud_maintenance_mode or (nextcloud_maintenance_mode_autodisable | d(false))
+  when: (not nextcloud_maintenance_mode | bool) or (nextcloud_maintenance_mode_autodisable | d(false))
