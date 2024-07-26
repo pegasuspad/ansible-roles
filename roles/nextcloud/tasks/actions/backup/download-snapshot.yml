@@ -1,0 +1,36 @@
+---
+- name: (RESTORE) Generate timestamp (YYYYMMDDTHHMMSS)
+  ansible.builtin.set_fact:
+    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+- name: (RESTORE) Calculate restore destination path
+  ansible.builtin.set_fact:
+    restore_destination: "{{ __nextcloud_paths.backup_restore }}/{{ nextcloud_snapshot_id }}"
+
+- name: (RESTORE) Check if restored data exists
+  ansible.builtin.stat:
+    path: "{{ restore_destination }}"
+  register: restored_data_path
+
+- name: Download restic snapshot
+  when: not restored_data_path.stat.exists
+  block:
+    - name: (RESTORE) Calculate restore temp path
+      ansible.builtin.set_fact:
+      restore_temp_path: "{{ __nextcloud_paths.backup_temp }}/{{ timestamp }}"
+    - name: (RESTORE) Create restore temp directory
+      ansible.builtin.file:
+        group: root
+        mode: "0700"
+        owner: root
+        path: "{{ restore_temp_path }}"
+        state: directory
+    - name: (RESTORE) Extract the snapshot from restic
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: "source /opt/backup/access-all.sh && restic restore --no-lock '{{ nextcloud_snapshot_id }}' --target '{{ restore_temp_path }}'"
+        creates: "{{ restore_temp_path }}/data"
+    - name: (RESTORE) Move extracted snapshot to final directory
+      command: mv '{{ restore_temp_path }}' '{{ restore_destination }}'
+      args:
+        creates: '{{ restore_destination }}'
+        removes: '{{ restore_temp_path }}'
