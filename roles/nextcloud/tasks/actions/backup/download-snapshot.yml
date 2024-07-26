@@ -29,6 +29,13 @@
         executable: /bin/bash
         cmd: "source /opt/backup/access-all.sh && restic restore --no-lock '{{ nextcloud_snapshot_id }}' --target '{{ restore_temp_path }}'"
         creates: "{{ restore_temp_path }}/data"
+    - name: (RESTORE) Create restore snapshot directory
+      ansible.builtin.file:
+        group: root
+        mode: "0700"
+        owner: root
+        path: "{{ __nextcloud_paths.backup_restore }}"
+        state: directory
     - name: (RESTORE) Move extracted snapshot to final directory
       command: mv '{{ restore_temp_path }}' '{{ restore_destination }}'
       args:
