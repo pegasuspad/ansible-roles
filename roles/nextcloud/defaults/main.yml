@@ -21,7 +21,6 @@ nextcloud_backup_user: nextcloud
 
 # database configuration
 # nextcloud_db_root_password:
-
 # nextcloud_db: Initial database configuration. This is ignored after Nextcloud's one-time setup has been completed. [provide DB during one-time setup]
 # nextcloud_db.host: Database host server name.
 # nextcloud_db.name: Name of the Nextcloud database. ["nextcloud"]
