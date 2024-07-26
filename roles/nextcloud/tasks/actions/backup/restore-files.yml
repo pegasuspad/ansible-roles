@@ -1,0 +1,37 @@
+---
+- name: (RESTORE) Calculate snapshot files path
+  ansible.builtin.set_fact:
+    snapshot_files: "{{ __nextcloud_paths.backup_restore }}/{{ nextcloud_snapshot_id }}/data"
+- name: (RESTORE) Check if snapshot files exist
+  ansible.builtin.stat:
+    path: "{{ snapshot_files }}"
+  register: files_path
+
+- name: (RESTORE) Extract snapshot, if missing
+  when: not files_path.stat.exists
+  ansible.builtin.include_tasks:
+    file: actions/backup/download-snapshot.yml
+
+- name: (RESTORE) Enable maintenance mode
+  ansible.builtin.include_tasks:
+    file: actions/maintenance-mode-enable.yml
+
+- name: (RESTORE) Remove existing data directory
+  ansible.builtin.file:
+    path: "{{ __nextcloud_paths.data }}"
+    state: absent
+- name: (RESTORE) Recreate data directory with correct permissions
+  ansible.builtin.file:
+    group: www-data
+    mode: "0750"
+    owner: www-data
+    path: "{{ __nextcloud_paths.data }}"
+    state: directory
+- name: (RESTORE) Sync restored data to Nextcloud data directory
+  ansible.posix.synchronize:
+    archive: true
+    compress: true
+    delete: true
+    dest: "{{ __nextcloud_paths.data }}"
+    mode: push
+    src: "{{ snapshot_files }}/"
