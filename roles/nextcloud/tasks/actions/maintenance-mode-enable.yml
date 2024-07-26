@@ -1,0 +1,12 @@
+---
+- name: "Update maintenance.config.php"
+  ansible.builtin.template:
+    src: maintenance.config.php.j2
+    dest: "{{ __nextcloud_paths.config }}/maintenance.config.php"
+    group: www-data
+    mode: "0770"
+    owner: www-data
+  notify:
+    - disable maintenance mode 
+  vars:
+    nextcloud_maintenance_mode: true
