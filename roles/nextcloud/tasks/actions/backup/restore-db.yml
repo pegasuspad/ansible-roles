@@ -14,10 +14,7 @@
 
 - name: (RESTORE) Enable maintenance mode
   ansible.builtin.include_tasks:
-    file: actions/set-maintenance-mode.yml
-  vars:
-    nextcloud_maintenance_mode: true
-    nextcloud_maintenance_mode_autodisable: true
+    file: actions/enable-maintenance-mode-with-autodisable.yml
 
 - name: (RESTORE) Delete existing database
   community.mysql.mysql_db:

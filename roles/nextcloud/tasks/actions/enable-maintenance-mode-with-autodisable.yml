@@ -10,3 +10,7 @@
     group: www-data
     mode: "0770"
     owner: www-data
+  notify:
+    - disable maintenance mode
+  vars:
+    nextcloud_maintenance_mode: true
