@@ -3,8 +3,14 @@
 set -e
 
 backupDirectory="{{ __nextcloud_paths.backup_temp }}/staging"
+dbHost="{{ nextcloud_db.host }}"
+dbName="{{ nextcloud_db.name }}"
+dbPassword="{{ nextcloud_db.password }}"
+dbUsername="{{ nextcloud_db.username }}"
 occPath="{{ __nextcloud_current_version_path }}/occ"
 sourceDirectory="{{ __nextcloud_paths.data }}"
+
+set -x
 
 # Remove existing staging directory
 rm -rf "${backupDirectory}"
@@ -13,13 +19,28 @@ rm -rf "${backupDirectory}"
 mkdir -p "${backupDirectory}/data"
 
 # Create unsafe staged backup, which will be resynced during maintenance mode
-rsync -az --delete "${sourceDirectory}/" "${backupDirectory}/data"
+rsync -Aavxz --delete "${sourceDirectory}/" "${backupDirectory}/data"
 
 # Finalize staged backup with any changes made during initial sync
 # Enable maintenance mode
 sudo -u www-data php "${occPath}" maintenance:mode --on
 
 # Resync files to staging area
-rsync -az --delete "${sourceDirectory}/" "${backupDirectory}/data"
+rsync -Aavxz --delete "${sourceDirectory}/" "${backupDirectory}/data"
 
 # Create database backup
+mysqldump \
+  --single-transaction \
+  --default-character-set=utf8mb4 \
+  -h "${dbHost}" \
+  -u "${dbUsername}" \
+  "-p${dbPassword}" \
+  "${dbName}" \
+  | gzip > "${backupDirectory}/db.sql.gz"
+
+# Disable maintenance mode
+sudo -u www-data php "${occPath}" maintenance:mode --off
+
+
+# need to -
+#   update maintenance mode tasks

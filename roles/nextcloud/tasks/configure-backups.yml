@@ -47,6 +47,7 @@
     dest: /usr/local/bin
     owner: root
     group: root
-    mode: "0744"
+    # these files contain credentials, so only allow root to read them
+    mode: "0700"
   with_fileglob:
     - "../templates/usr/local/bin/*"
