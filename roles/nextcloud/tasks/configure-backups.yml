@@ -40,3 +40,13 @@
         password: '{{ __nextcloud_backup.repository.password }}'
         init: false
     restic_script_dir: /opt/backup
+
+- name: (BACKUP) Install backup scripts
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: /usr/local/bin
+    owner: root
+    group: root
+    mode: "0744"
+  with_fileglob:
+    - "../templates/usr/local/bin/*"
