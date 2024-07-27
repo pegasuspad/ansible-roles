@@ -38,5 +38,5 @@
         aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
         location: '{{ nextcloud_backup_repository.url }}'
         password: '{{ __nextcloud_backup.repository.password }}'
-        init: false
+        init: true
     restic_script_dir: /opt/backup
