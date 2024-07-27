@@ -33,10 +33,10 @@
     restic_download_path: /opt/backup
     restic_no_log: false
     restic_repos:
-      aws:
+      aws: # actually B2
         aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
         aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
         location: '{{ nextcloud_backup_repository.url }}'
-        password: '{{ __nextcloud_backup.repository.repository_password }}'
+        password: '{{ __nextcloud_backup.repository.password }}'
         init: false
     restic_script_dir: /opt/backup
