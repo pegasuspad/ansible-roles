@@ -23,8 +23,7 @@
     name: roles-ansible.restic
   vars:
     restic_backups:
-      backblaze:
-        name: backblaze
+      - name: backblaze
         niceness: 10
         repo: aws
         scheduled: false
