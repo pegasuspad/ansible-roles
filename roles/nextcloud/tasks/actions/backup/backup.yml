@@ -3,3 +3,6 @@
 - name: (BACKUP) Stage files for new backup
   ansible.builtin.include_tasks:
     file: actions/backup/stage-backup.yml
+- name: (BACKUP) Backup staged files to restic repository
+  ansible.builtin.shell:
+    cmd: /opt/backup/backup-backblaze.sh
