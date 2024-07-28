@@ -25,6 +25,7 @@
     restic_backups:
       - name: backblaze
         niceness: 10
+        pre_backup_cmd: /usr/local/bin/stage-backup
         repo: aws
         scheduled: false
         src: '{{ __nextcloud_paths.backup_temp }}'

@@ -10,11 +10,6 @@ dbUsername="{{ nextcloud_db.username }}"
 occPath="{{ __nextcloud_current_version_path }}/occ"
 sourceDirectory="{{ __nextcloud_paths.data }}"
 
-set -x
-
-# Remove existing staging directory
-rm -rf "${backupDirectory}"
-
 # Recreate staging data directory
 mkdir -p "${backupDirectory}/data"
 
@@ -23,7 +18,7 @@ rsync -Aavxz --delete "${sourceDirectory}/" "${backupDirectory}/data"
 
 # Finalize staged backup with any changes made during initial sync
 # Enable maintenance mode
-sudo -u www-data php "${occPath}" maintenance:mode --on
+sudo -u www-data php "${occPath}" maintenance:mode --no-ansi --on
 
 # Resync files to staging area
 rsync -Aavxz --delete "${sourceDirectory}/" "${backupDirectory}/data"
@@ -39,8 +34,4 @@ mysqldump \
   | gzip > "${backupDirectory}/db.sql.gz"
 
 # Disable maintenance mode
-sudo -u www-data php "${occPath}" maintenance:mode --off
-
-
-# need to -
-#   update maintenance mode tasks
+sudo -u www-data php "${occPath}" maintenance:mode --no-ansi --off
