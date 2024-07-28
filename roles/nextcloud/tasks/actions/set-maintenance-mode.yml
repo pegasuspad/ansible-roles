@@ -7,4 +7,4 @@
   ansible.builtin.shell:
     cmd: sudo -u www-data php "{{ __nextcloud_current_version_path }}/occ" maintenance:mode --no-ansi "{{ mode_flag }}"
   vars:
-    mode_flag: "{{ '--on' if nextcloud_maintenance_mode else '--off' }}"
+    mode_flag: "{{ '--on' if (nextcloud_maintenance_mode | bool) else '--off' }}"
