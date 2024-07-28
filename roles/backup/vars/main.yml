@@ -15,8 +15,8 @@ __backup_default_item_base:
     src: '{{ backup_source_path }}'
     tags: '{{ backup_extra_tags }}'
 
-__backup_default_monitoring_call: "{{ { monitoring_call: backup_hook_after | d(omit) } }}"
-__backup_default_pre_backup_cmd: "{{ { pre_backup_cmd: backup_hook_before | d(omit) } }}"
+__backup_default_monitoring_call: "{{ { monitoring_call: backup_hook_after } if backup_hook_after is defined else {} }}"
+__backup_default_pre_backup_cmd: "{{ { pre_backup_cmd: backup_hook_before } if backup_hook_before is defined else {} }}"
 __backup_default_item: '{{ __backup_default_item_base | combine(__backup_default_monitoring_call) | combine(__backup_default_pre_backup_cmd) }}'
 
 # list of all backup configurations, including the default and extra ones
