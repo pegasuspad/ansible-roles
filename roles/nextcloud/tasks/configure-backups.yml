@@ -24,7 +24,8 @@
   vars:
     backup_extra_tags:
       - v{{ nextcloud_version }}
-    # backup_hook_before: '{{ __nextcloud_backup.script_dir }}/stage-backup'
+    backup_hook_before: '{{ __nextcloud_backup.script_dir }}/stage-backup'
+    backup_no_log: false
     backup_repository:
       aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
       aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
