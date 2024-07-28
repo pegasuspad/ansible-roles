@@ -10,4 +10,4 @@
     cmd: sudo -u www-data php "{{ __nextcloud_current_version_path }}/occ" maintenance:mode --no-ansi --on
   notify:
     - disable maintenance mode
-  when: '{{ maintenance_mode_result is search("disabled") }}'
+  when: maintenance_mode_result is search("disabled")
