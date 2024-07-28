@@ -1,0 +1,50 @@
+# backup_enabled: Whether any backup configuration is enabled or not
+backup_enabled: true
+
+# backup_extra_backups: List of additional backup configurations. See https://github.com/roles-ansible/ansible_role_restic?tab=readme-ov-file#backups. [none]
+backup_extra_backups: []
+
+# { key: string; value: settings }
+# backup_extra_repositories: List of dictionaries with shape { key, value }, where key is the name of a repository and the value is a repository configuration. [none]
+# For information on valid props for the repo configuration, see https://github.com/roles-ansible/ansible_role_restic?tab=readme-ov-file#repos.
+backup_extra_repositories: []
+
+# backup_extra_tags: List of extra tags to apply to snapshots made with the default backup configuration. [none]
+backup_extra_tags: []
+
+# backup_group: Group name for the backup user. [value of backup_user, which is 'root' by default]
+backup_group: '{{ backup_user }}'
+
+# backup_hook_after: Command which will be called after succesful backups for the default configuration. [none]
+# backup_hook_after:
+
+# backup_hook_before: Command to run before making backups with the default configuration. [none]
+# backup_hook_before:
+
+# backup_niceness: Niceness value to use for backups
+backup_niceness: 10
+
+# backup_no_log: If true, command output is suppressed. [true]
+backup_no_log: true
+
+# backup_repository_name: Name for the default backup and repository configurations. ['default']
+backup_repository_name: default
+
+# backup_repository: Configuration for the default repository.
+# backup_repository
+
+# backup_source_path: Source directory to backup with the default configuration.
+# backup_source_path:
+
+# backup_schedule: Default schedule to use for backups. ['*-*-* 02:00:00']
+backup_schedule: '*-*-* 02:00:00'
+
+# backup_schedule_enabled: Whether to enable schedule backups for the default configuration. [false]
+backup_schedule_enabled: false
+
+# backup_script_dir: Path at which binaries and backup scripts wil be installed. [/opt/backup]
+backup_script_dir: /opt/backup
+
+# backup_group: User name for the backup user. [root]
+backup_user: root
+
