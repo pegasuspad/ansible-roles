@@ -30,7 +30,8 @@
         scheduled: true
         src: '{{ __nextcloud_paths.backup_staging }}'
         tags:
-          - v{{ nextcloud_version }}
+          - v{{ nextcloud_version }} 
+    restic_create_schedule: true
     restic_dir_group: '{{ __nextcloud_backup.group }}'
     restic_dir_owner: '{{ __nextcloud_backup.user }}'
     restic_download_path: '{{ __nextcloud_backup.script_dir }}'
