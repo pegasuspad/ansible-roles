@@ -1,8 +1,5 @@
 # Perform all the steps to create a new snapshot in the backup repository
 
-- name: (BACKUP) Stage files for new backup
-  ansible.builtin.include_tasks:
-    file: actions/backup/stage-backup.yml
-- name: (BACKUP) Backup staged files to restic repository
+- name: (BACKUP) Create manual backup
   ansible.builtin.shell:
-    cmd: /opt/backup/backup-backblaze.sh
+    cmd: '{{ __nextcloud_backup.script_dir }}/backup-{{ __nextcloud_backup.name }}.sh'

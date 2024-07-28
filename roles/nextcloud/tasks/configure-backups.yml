@@ -23,15 +23,17 @@
     name: roles-ansible.restic
   vars:
     restic_backups:
-      - name: backblaze
+      - name: '{{ __nextcloud_backup.name }}'
         niceness: 10
-        pre_backup_cmd: /usr/local/bin/stage-backup
+        pre_backup_cmd: '{{ __nextcloud_backup.script_dir }}/stage-backup'
         repo: aws
         scheduled: false
         src: '{{ __nextcloud_paths.backup_temp }}'
+        tags:
+          - v{{ nextcloud_version }}
     restic_dir_group: '{{ __nextcloud_backup.group }}'
     restic_dir_owner: '{{ __nextcloud_backup.user }}'
-    restic_download_path: /opt/backup
+    restic_download_path: '{{ __nextcloud_backup.script_dir }}'
     restic_no_log: true
     restic_repos:
       aws: # actually B2
@@ -40,15 +42,15 @@
         location: '{{ nextcloud_backup_repository.url }}'
         password: '{{ __nextcloud_backup.repository.password }}'
         init: false
-    restic_script_dir: /opt/backup
+    restic_script_dir: '{{ __nextcloud_backup.script_dir }}'
 
 - name: (BACKUP) Install backup scripts
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: /usr/local/bin
+    dest: '{{ __nextcloud_backup.script_dir }}'
     owner: root
     group: root
     # these files contain credentials, so only allow root to read them
     mode: "0700"
   with_fileglob:
-    - "../templates/usr/local/bin/*"
+    - "../templates/[__nextcloud_backup.script_dir]/*"
