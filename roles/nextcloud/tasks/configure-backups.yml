@@ -53,4 +53,4 @@
     # these files contain credentials, so only allow root to read them
     mode: "0700"
   with_fileglob:
-    - "../templates/[__nextcloud_backup.script_dir]/*"
+    - "../templates/__nextcloud_backup.script_dir/*"
