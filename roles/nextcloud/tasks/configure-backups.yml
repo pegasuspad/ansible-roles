@@ -27,7 +27,7 @@
         niceness: 10
         pre_backup_cmd: '{{ __nextcloud_backup.script_dir }}/stage-backup'
         repo: aws
-        scheduled: false
+        scheduled: true
         src: '{{ __nextcloud_paths.backup_staging }}'
         tags:
           - v{{ nextcloud_version }}
