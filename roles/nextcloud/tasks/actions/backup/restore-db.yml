@@ -16,8 +16,10 @@
 # (missing app configuration, for example) may prevent successfully entering maintenance mode.
 # TODO - in cases like this, should we shut down Apache?
 - name: (RESTORE) Try to enable maintenance mode
-  ansible.builtin.include_tasks:
-    file: actions/enable-maintenance-mode-with-autodisable.yml
+  block:
+    - name: (RESTORE) Invoke actions/enable-maintenance-mode-with-autodisable.yml
+      ansible.builtin.include_tasks:
+        file: actions/enable-maintenance-mode-with-autodisable.yml
   ignore_errors: yes 
 
 - name: (RESTORE) Delete existing database
