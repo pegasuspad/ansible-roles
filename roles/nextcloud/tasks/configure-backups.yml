@@ -20,7 +20,7 @@
 
 - name: (BACKUP) Install and configure restic
   ansible.builtin.include_role:
-    name: roles-ansible.restic
+    name: local.pegasuspad.restic
   vars:
     restic_backups:
       - name: '{{ __nextcloud_backup.name }}'
