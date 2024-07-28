@@ -28,7 +28,7 @@
         pre_backup_cmd: '{{ __nextcloud_backup.script_dir }}/stage-backup'
         repo: aws
         scheduled: false
-        src: '{{ __nextcloud_paths.backup_temp }}'
+        src: '{{ __nextcloud_paths.backup_staging }}'
         tags:
           - v{{ nextcloud_version }}
     restic_dir_group: '{{ __nextcloud_backup.group }}'

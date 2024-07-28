@@ -2,7 +2,7 @@
 
 set -e
 
-backupDirectory="{{ __nextcloud_paths.backup_temp }}/staging"
+backupDirectory="{{ __nextcloud_paths.backup_staging }}"
 dbHost="{{ nextcloud_db.host }}"
 dbName="{{ nextcloud_db.name }}"
 dbPassword="{{ nextcloud_db.password }}"
