@@ -7,13 +7,13 @@ __backup_repo_list: '{{ __backup_default_repository_item + backup_extra_reposito
 
 # temp variable used to build __backup_backup_list
 __backup_default_item_base:
-  - name: '{{ backup_repository_name }}'
-    niceness: '{{ backup_niceness }}'
-    repo: '{{ backup_repository_name }}'
-    schedule_oncalendar: '{{ backup_schedule }}'
-    scheduled: '{{ backup_schedule_enabled }}'
-    src: '{{ backup_source_path }}'
-    tags: '{{ backup_extra_tags }}'
+  name: '{{ backup_repository_name }}'
+  niceness: '{{ backup_niceness }}'
+  repo: '{{ backup_repository_name }}'
+  schedule_oncalendar: '{{ backup_schedule }}'
+  scheduled: '{{ backup_schedule_enabled }}'
+  src: '{{ backup_source_path }}'
+  tags: '{{ backup_extra_tags }}'
 
 __backup_default_monitoring_call: "{{ { monitoring_call: backup_hook_after } if backup_hook_after is defined else {} }}"
 __backup_default_pre_backup_cmd: "{{ { pre_backup_cmd: backup_hook_before } if backup_hook_before is defined else {} }}"
