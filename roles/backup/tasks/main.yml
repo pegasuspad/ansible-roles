@@ -10,4 +10,5 @@
     restic_no_log: '{{ backup_no_log }}'
     restic_repos: '{{ __backup_repo_list | items2dict }}'
     restic_script_dir: '{{ backup_script_dir }}'
+    restic_version: '{{ backup_restic_version }}'
   when: backup_enabled is defined

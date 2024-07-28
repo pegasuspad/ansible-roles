@@ -33,6 +33,9 @@ backup_repository_name: default
 # backup_repository: Configuration for the default repository.
 # backup_repository
 
+# backup_restic_version: Version of restic to install. [0.16.5]
+backup_restic_version: 0.16.5
+
 # backup_source_path: Source directory to backup with the default configuration.
 # backup_source_path:
 
