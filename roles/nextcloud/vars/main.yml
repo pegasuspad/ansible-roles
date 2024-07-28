@@ -1,10 +1,8 @@
 __nextcloud_backup:
   enabled: "{{ nextcloud_backup_enabled }}"
-  group: "{{ nextcloud_backup_group }}"
   name: cloud
   repository: "{{ nextcloud_backup_repository }}"
   script_dir: /opt/backup
-  user: "{{ nextcloud_backup_user }}"
 
 # __nextcloud_config_file: absolute path to the nextcloud config.php file
 __nextcloud_config_file: "{{ __nextcloud_paths.config }}/config.php"
