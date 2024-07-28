@@ -1,7 +1,10 @@
  Ansible Role: restic
 =======================
 
-> **FORK** This is a fork of the original ansible-roles.restic role which allows using relative paths for the backup.
+**FORK** This is a fork of the original ansible-roles.restic role:
+
+- allows using relative paths for the backup.
+- abort backup if pre_backup_cmd fails
 
 > **Beta:** This role is in beta status.
 

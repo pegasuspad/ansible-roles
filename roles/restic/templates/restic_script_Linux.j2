@@ -243,6 +243,9 @@ else
       {%- endif -%}
       {{ ' ' }}Please repair the restic-{{ item.name | replace(' ', '') }} job."
     {% endif %}
+
+    echo Failed to invoke pre_backup_cmd. See above errors.
+    exit 1
 fi
 {% endif %}
 
