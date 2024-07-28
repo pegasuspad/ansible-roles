@@ -3,10 +3,8 @@
 # Variables:
 #   - nextcloud_maintenance_mode: the mode to set, true or false
 
-- name: "(CONFIGURE) Update maintenance.config.php"
-  ansible.builtin.template:
-    src: maintenance.config.php.j2
-    dest: "{{ __nextcloud_paths.config }}/maintenance.config.php"
-    group: www-data
-    mode: "0770"
-    owner: www-data
+- name: "(CONFIGURE) Set maintenance mode using occ"
+  ansible.builtin.shell:
+    cmd: sudo -u www-data php "{{ __nextcloud_current_version_path }}/occ" maintenance:mode --no-ansi "{{ mode_flag }}"
+  vars:
+    mode_flag: "{{ '--on' if nextcloud_maintenance_mode else '--off' }}"
