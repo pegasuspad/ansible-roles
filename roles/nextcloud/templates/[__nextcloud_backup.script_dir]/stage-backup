@@ -10,6 +10,8 @@ dbUsername="{{ nextcloud_db.username }}"
 occPath="{{ __nextcloud_current_version_path }}/occ"
 sourceDirectory="{{ __nextcloud_paths.data }}"
 
+set -x
+
 # Recreate staging data directory
 mkdir -p "${backupDirectory}/data"
 
@@ -17,13 +19,24 @@ mkdir -p "${backupDirectory}/data"
 rsync -Aavxz --delete "${sourceDirectory}/" "${backupDirectory}/data"
 
 # Finalize staged backup with any changes made during initial sync
-# Enable maintenance mode
-sudo -u www-data php "${occPath}" maintenance:mode --no-ansi --on
+
+# if we are NOT alreayd in maintenance mode...
+if sudo -u www-data php "${occPath}" maintenance:mode --no-ansi | grep 'disabled' -q; then 
+  # Enable maintenance mode
+  sudo -u www-data php "${occPath}" maintenance:mode --no-ansi --on
+
+  # and disable maintenance mode when this script exits, regardless of result
+  trap 'sudo -u www-data php "{{ __nextcloud_current_version_path }}/occ" maintenance:mode --no-ansi --off' EXIT
+fi
 
 # Resync files to staging area
 rsync -Aavxz --delete "${sourceDirectory}/" "${backupDirectory}/data"
 
+# disable command output, due to credentials in next one
+set +x
+
 # Create database backup
+echo "Creating database dump..."
 mysqldump \
   --single-transaction \
   --default-character-set=utf8mb4 \
@@ -32,6 +45,3 @@ mysqldump \
   "-p${dbPassword}" \
   "${dbName}" \
   | gzip > "${backupDirectory}/db.sql.gz"
-
-# Disable maintenance mode
-sudo -u www-data php "${occPath}" maintenance:mode --no-ansi --off
