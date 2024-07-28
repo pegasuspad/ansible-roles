@@ -9,9 +9,14 @@
   changed_when: False
   register: maintenance_mode_result
 
+- name: (CONFIGURE) Setting current and desired states
+  ansible.builtin.set_fact:
+    current_state: '{{ "enabled" in maintenance_mode_result }}'
+    desired_state: '{{ nextcloud_maintenance_mode | bool }}'
+
 - name: "(CONFIGURE) Set maintenance mode using occ"
   ansible.builtin.shell:
     cmd: sudo -u www-data php "{{ __nextcloud_current_version_path }}/occ" maintenance:mode --no-ansi "{{ mode_flag }}"
   vars:
-    mode_flag: "{{ '--on' if (nextcloud_maintenance_mode | bool) else '--off' }}"
-  when: ('"disabled" in maintenance_mode_result' and (nextcloud_maintenance_mode | bool)) or ('"enabled" in maintenance_mode_result' and not (nextcloud_maintenance_mode | bool))
+    mode_flag: "{{ '--on' if desired_state else '--off' }}"
+  when: current_state != desired_state
