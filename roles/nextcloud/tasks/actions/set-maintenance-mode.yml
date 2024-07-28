@@ -11,7 +11,7 @@
 
 - name: (CONFIGURE) Setting current and desired states
   ansible.builtin.set_fact:
-    current_state: '{{ "enabled" in maintenance_mode_result }}'
+    current_state: '{{ maintenance_mode_result is search("enabled") }}'
     desired_state: '{{ nextcloud_maintenance_mode | bool }}'
 
 - name: "(CONFIGURE) Set maintenance mode using occ"
