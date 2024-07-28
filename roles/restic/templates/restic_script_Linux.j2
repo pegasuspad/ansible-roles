@@ -266,7 +266,8 @@ fi
 {% else %}
 {
   {% if item.lvm is defined %}prepare_vol $BACKUP_SOURCE &&{% endif %}
-  {{ restic_install_path }}/restic backup {% if item.lvm is defined and item.src == '/' %}/rootfs{% endif %}$BACKUP_SOURCE $MODE_TAG \
+  cd {% if item.lvm is defined and item.src == '/' %}/rootfs{% endif %}$BACKUP_SOURCE
+  {{ restic_install_path }}/restic backup . $MODE_TAG \
     {{ tags(item.tags) }} \
     {% if item.exclude is defined %}{{ exclude(item.exclude) }}{% endif %} \
     $@
