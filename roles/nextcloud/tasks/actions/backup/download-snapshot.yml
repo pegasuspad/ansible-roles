@@ -27,7 +27,7 @@
     - name: (RESTORE) Extract the snapshot from restic
       ansible.builtin.shell:
         executable: /bin/bash
-        cmd: "source '{{ __nextcloud_backup.script_dir }}/access-{{ __nextcloud_backup.name }}.sh' && restic restore --no-lock '{{ nextcloud_snapshot_id }}' --target '{{ restore_temp_path }}'"
+        cmd: "source '{{ __nextcloud_backup.script_dir }}/access-{{ backup_repository_name }}.sh' && restic restore --no-lock '{{ nextcloud_snapshot_id }}' --target '{{ restore_temp_path }}'"
         creates: "{{ restore_temp_path }}/data"
     - name: (RESTORE) Create restore snapshot directory
       ansible.builtin.file:

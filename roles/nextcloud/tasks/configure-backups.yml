@@ -18,34 +18,60 @@
 #     state: present
 #     user: "root"
 
-- name: (BACKUP) Install and configure restic
+- name: (BACKUP) Install and configure backup scripts
   ansible.builtin.include_role:
-    name: local.pegasuspad.restic
+    name: local.pegasuspad.backup
   vars:
-    restic_backups:
-      - name: '{{ __nextcloud_backup.name }}'
-        niceness: 10
-        pre_backup_cmd: '{{ __nextcloud_backup.script_dir }}/stage-backup'
-        repo: aws
-        schedule_oncalendar: '*-*-* *:00:00'
-        scheduled: true
-        src: '{{ __nextcloud_paths.backup_staging }}'
-        tags:
-          - v{{ nextcloud_version }} 
-    restic_create_schedule: true
-    restic_dir_group: '{{ __nextcloud_backup.group }}'
-    restic_dir_owner: '{{ __nextcloud_backup.user }}'
-    restic_download_path: '{{ __nextcloud_backup.script_dir }}'
-    restic_no_log: true
-    restic_repos:
-      aws: # actually B2
-        aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
-        aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
-        location: '{{ nextcloud_backup_repository.url }}'
-        password: '{{ __nextcloud_backup.repository.password }}'
-        init: false
-    restic_script_dir: '{{ __nextcloud_backup.script_dir }}'
-    restic_systemd_timer_randomizeddelaysec: 0
+    backup_extra_tags:
+      - v{{ nextcloud_version }}
+    backup_hook_before: '{{ __nextcloud_backup.script_dir }}/stage-backup'
+    backup_repository:
+      aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
+      aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
+      location: '{{ nextcloud_backup_repository.url }}'
+      password: '{{ __nextcloud_backup.repository.password }}'
+    backup_schedule: '*-*-* *:00:00'
+    backup_schedule_enabled: true
+    backup_source_path: '{{ __nextcloud_paths.backup_staging }}'
+
+# - name: (BACKUP) Install and configure restic
+#   ansible.builtin.include_role:
+#     name: local.pegasuspad.restic
+#   vars:
+#     restic_backups:
+#       - name: '{{ __nextcloud_backup.name }}'
+#         niceness: 10
+#         pre_backup_cmd: '{{ __nextcloud_backup.script_dir }}/stage-backup'
+#         repo: b2_lab
+#         schedule_oncalendar: '*-*-* *:00:00'
+#         scheduled: true
+#         src: '{{ __nextcloud_paths.backup_staging }}'
+#         tags:
+#           - v{{ nextcloud_version }} 
+#       - name: prod_ro
+#         repo: b2_prod_ro
+#         scheduled: false
+#         src: '{{ __nextcloud_paths.backup_staging }}'
+#     restic_create_schedule: true
+#     restic_dir_group: '{{ __nextcloud_backup.group }}'
+#     restic_dir_owner: '{{ __nextcloud_backup.user }}'
+#     restic_download_path: '{{ __nextcloud_backup.script_dir }}'
+#     restic_no_log: true
+#     restic_repos:
+#       b2_lab:
+#         aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
+#         aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
+#         location: '{{ nextcloud_backup_repository.url }}'
+#         password: '{{ __nextcloud_backup.repository.password }}'
+#         init: false
+#       b2_prod_ro:
+#         aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
+#         aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
+#         location: '{{ nextcloud_backup_repository.url }}'
+#         password: '{{ __nextcloud_backup.repository.password }}'
+#         init: false
+#     restic_script_dir: '{{ __nextcloud_backup.script_dir }}'
+#     restic_systemd_timer_randomizeddelaysec: 0
 
 - name: (BACKUP) Install backup scripts
   ansible.builtin.template:

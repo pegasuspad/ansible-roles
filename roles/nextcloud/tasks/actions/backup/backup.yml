@@ -2,4 +2,5 @@
 
 - name: (BACKUP) Create manual backup
   ansible.builtin.shell:
-    cmd: '{{ __nextcloud_backup.script_dir }}/backup-{{ __nextcloud_backup.name }}.sh'
+    cmd: '{{ __nextcloud_backup.script_dir }}/backup-{{ backup_repository_name }}.sh'
+
