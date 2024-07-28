@@ -3,7 +3,7 @@ __backup_default_repository_item:
   - key: '{{ backup_repository_name }}'
     value: '{{ backup_repository }}'
 # list of all backup repositories, including the default and extra ones
-__backup_repo_list: '{{ [__backup_default_repository_item] + backup_extra_repositories }}'
+__backup_repo_list: '{{ __backup_default_repository_item + backup_extra_repositories }}'
 
 # temp variable used to build __backup_backup_list
 __backup_default_item:
@@ -17,4 +17,4 @@ __backup_default_item:
     src: '{{ backup_source_path }}'
     tags: '{{ backup_extra_tags }}'
 # list of all backup configurations, including the default and extra ones
-__backup_backup_list: '{{ [__backup_default_item] + backup_extra_backups }}'
+__backup_backup_list: '{{ __backup_default_item + backup_extra_backups }}'
