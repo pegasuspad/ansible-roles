@@ -45,6 +45,7 @@
         password: '{{ __nextcloud_backup.repository.password }}'
         init: false
     restic_script_dir: '{{ __nextcloud_backup.script_dir }}'
+    restic_systemd_timer_randomizeddelaysec: 0
 
 - name: (BACKUP) Install backup scripts
   ansible.builtin.template:
