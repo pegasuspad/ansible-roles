@@ -1,4 +1,4 @@
 ---
-- name: (BACKUP) Invoke staging script - {{ __nextcloud_backup.script_dir }}/stage-backup
+- name: (BACKUP) Invoke staging script - /usr/local/bin/stage-backup
   ansible.builtin.shell:
-    cmd: '{{ __nextcloud_backup.script_dir }}/stage-backup'
+    cmd: /usr/local/bin/stage-backup

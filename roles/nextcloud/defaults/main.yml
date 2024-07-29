@@ -1,5 +1,5 @@
 ---
-# name of the log file that should contain backup process logs. ["/var/log/nextcloud.log"]
+# name of the log file that should contain logs. ["/var/log/nextcloud.log"]
 nextcloud_logfile: /var/log/nextcloud.log
 
 # nextcloud_admin: Initial credentials for the admin account. [provide during one-time setup]
@@ -13,11 +13,8 @@ nextcloud_backup_enabled: false
 # nextcloud_backup_path: Path in which backup/restore operations are performed. [{{ nextcloud_path }}/backup]
 nextcloud_backup_path: '{{ nextcloud_path }}/backup'
 
-# nextcloud_backup_repository: secrets used to access the remote backup repository
-# nextcloud_backup_repository.b2_access_key_id:
-# nextcloud_backup_repository.b2_access_key_secret:
-# nextcloud_backup_repository.url
-# nextcloud_backup_repository.password: 
+# nextcloud_backup_repository_name: Name of the restic repository to use for Nextcloud backups. Must be added via backup_repositories. [default]
+nextcloud_backup_repository_name: default
 
 # nextcloud_data_path: Base path for instance-specific data (apps, config, and files). ["{{ nextcloud_path }}/data"]
 # nextcloud_data_path:

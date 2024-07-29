@@ -1,7 +1,7 @@
 ---
 - name: (RESTORE) Calculate snapshot path
   ansible.builtin.set_fact:
-    restore_destination: "{{ __nextcloud_paths.backup_restore }}/{{ nextcloud_snapshot_id }}"
+    restore_destination: "{{ __nextcloud_paths.backup_restore }}/{{ backup_snapshot_id }}"
 - name: (RESTORE) Check if database snapshot exists
   ansible.builtin.stat:
     path: "{{ restore_destination }}/db.sql.gz"

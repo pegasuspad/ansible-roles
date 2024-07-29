@@ -1,43 +1,23 @@
 ---
-- name: (RESTORE) Generate timestamp (YYYYMMDDTHHMMSS)
-  ansible.builtin.set_fact:
-    timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
-- name: (RESTORE) Calculate restore destination path
-  ansible.builtin.set_fact:
-    restore_destination: "{{ __nextcloud_paths.backup_restore }}/{{ nextcloud_snapshot_id }}"
+#
+# Required Inputs:
+#   - backup_snapshot_id: ID of the snapshot to restore.
+#
+# Optional Inputs:
+#   -  backup_repository_name: Name of the repository from which to restore a snapshot. [nextcloud_backup_repository_name]
+#
 
-- name: (RESTORE) Check if restored data exists
-  ansible.builtin.stat:
-    path: "{{ restore_destination }}"
-  register: restored_data_path
+- name: (RESTORE) Verify required parameters are set
+  ansible.builtin.assert:
+    fail_msg: Snapshot download request is invalid.
+    that:
+      - backup_snapshot_id is defined
+      - backup_snapshot_id | length > 0
 
-- name: Download restic snapshot
-  when: not restored_data_path.stat.exists
-  block:
-    - name: (RESTORE) Calculate restore temp path
-      ansible.builtin.set_fact:
-        restore_temp_path: "{{ __nextcloud_paths.backup_restore }}/{{ timestamp }}"
-    - name: (RESTORE) Create restore temp directory
-      ansible.builtin.file:
-        group: root
-        mode: "0700"
-        owner: root
-        path: "{{ restore_temp_path }}"
-        state: directory
-    - name: (RESTORE) Extract the snapshot from restic
-      ansible.builtin.shell:
-        executable: /bin/bash
-        cmd: "source '{{ __nextcloud_backup.script_dir }}/access-{{ backup_repository_name }}.sh' && restic restore --no-lock '{{ nextcloud_snapshot_id }}' --target '{{ restore_temp_path }}'"
-        creates: "{{ restore_temp_path }}/data"
-    - name: (RESTORE) Create restore snapshot directory
-      ansible.builtin.file:
-        group: root
-        mode: "0700"
-        owner: root
-        path: "{{ __nextcloud_paths.backup_restore }}"
-        state: directory
-    - name: (RESTORE) Move extracted snapshot to final directory
-      command: mv '{{ restore_temp_path }}' '{{ restore_destination }}'
-      args:
-        creates: '{{ restore_destination }}'
-        removes: '{{ restore_temp_path }}'
+- name: (RESTORE) Invoke backup role's download-snapshot tasks
+  include_role:
+    name: local.pegasuspad.backup
+    tasks_from: actions/download-snapshot.yml
+  vars:
+    backup_repository_name: '{{ backup_repository_name | default(nextcloud_backup_repository_name) }}'
+    backup_restore_path: '{{ __nextcloud_paths.backup_restore }}/{{ backup_snapshot_id }}'

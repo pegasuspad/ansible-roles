@@ -1,6 +1,12 @@
-# Perform all the steps to create a new snapshot in the backup repository
+---
+# Perform all the steps to create a new snapshot in a backup repository
+#
+# Optional Inputs:
+#   -  backup_repository_name: Name of the repository from which to restore a snapshot. [nextcloud_backup_repository_name]
+#
 
 - name: (BACKUP) Create manual backup
   ansible.builtin.shell:
-    cmd: '{{ __nextcloud_backup.script_dir }}/backup-{{ backup_repository_name }}.sh'
+    cmd: '/usr/local/bin/backup-{{ backup_repository_name | default(nextcloud_backup_repository_name) }}.sh'
+
 

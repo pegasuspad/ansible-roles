@@ -1,7 +1,7 @@
 ---
 - name: (RESTORE) Calculate snapshot files path
   ansible.builtin.set_fact:
-    snapshot_files: "{{ __nextcloud_paths.backup_restore }}/{{ nextcloud_snapshot_id }}/data"
+    snapshot_files: "{{ __nextcloud_paths.backup_restore }}/{{ backup_snapshot_id }}/data"
 - name: (RESTORE) Check if snapshot files exist
   ansible.builtin.stat:
     path: "{{ snapshot_files }}"

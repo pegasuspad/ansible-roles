@@ -1,9 +1,3 @@
-__nextcloud_backup:
-  enabled: "{{ nextcloud_backup_enabled }}"
-  name: cloud
-  repository: "{{ nextcloud_backup_repository }}"
-  script_dir: /opt/backup
-
 # __nextcloud_config_file: absolute path to the nextcloud config.php file
 __nextcloud_config_file: "{{ __nextcloud_paths.config }}/config.php"
 
@@ -39,9 +33,9 @@ __nextcloud_download_url: "https://download.nextcloud.com/server/releases/nextcl
 # __nextcloud_paths.work: Working directory for temp files
 __nextcloud_paths:
   apps: "{{ __nextcloud_data_path }}/apps"
-  backup: "{{ nextcloud_backup_path | default([nextcloud_path, 'backup'] | join('/')) }}"
-  backup_restore: "{{ nextcloud_backup_path | default([nextcloud_path, 'backup'] | join('/')) }}/restore"
-  backup_staging: "{{ nextcloud_backup_path | default([nextcloud_path, 'backup'] | join('/')) }}/staging"
+  backup: "{{ nextcloud_backup_path }}"
+  backup_restore: "{{ nextcloud_backup_path }}/restore"
+  backup_staging: "{{ nextcloud_backup_path }}/staging"
   config: "{{ __nextcloud_data_path }}/config"
   data: "{{ __nextcloud_data_path }}"
   files: "{{ __nextcloud_data_path }}/files"
