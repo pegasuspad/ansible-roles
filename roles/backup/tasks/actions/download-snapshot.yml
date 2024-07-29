@@ -18,7 +18,7 @@
   ansible.builtin.shell:
     executable: /bin/bash
     cmd: "source '{{ backup_script_dir }}/access-{{ backup_repository_name }}.sh' && restic restore --no-lock '{{ backup_snapshot_id }}' --target '{{ backup_restore_path }}'"
-  creates: '{{ backup_restore_path }}'
+    creates: '{{ backup_restore_path }}'
 
 - name: (RESTORE) Set owner of target directory to backup user/group
   ansible.builtin.file:
