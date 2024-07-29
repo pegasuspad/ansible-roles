@@ -31,6 +31,11 @@
         location: '{{ nextcloud_backup_repository.url }}'
         password: '{{ __nextcloud_backup.repository.password }}'
         schedule: '*-*-* *:00:00'
+      - name: test
+        aws_access_key: foo
+        aws_secret_access_key: bar
+        location: '{{ nextcloud_backup_repository.url }}'
+        password: foobar
     backup_source_path: '{{ __nextcloud_paths.backup_staging }}'
 
 # - name: (BACKUP) Install and configure restic
