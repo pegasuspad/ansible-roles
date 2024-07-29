@@ -1,0 +1,29 @@
+---
+#
+# Required Inputs:
+#   - backup_repository_name: Name of the repository from which to restore a snapshot.
+#   - backup_restore_path: Name of the directory into which the snapshot will be restored.
+#   - backup_snapshot_id: ID of the snapshot to restore.
+#
+
+- name: (RESTORE) Verify required parameters are set
+  ansible.builtin.assert:
+    fail_msg: Snapshot download request is invalid.
+    that:
+      - backup_repository_name is defined
+      - backup_restore_path is defined
+      - backup_snapshot_id is defined
+
+- name: (RESTORE) Extract the snapshot from restic to target directory
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: "source '{{ backup_script_dir }}/access-{{ backup_repository_name }}.sh' && restic restore --no-lock '{{ backup_snapshot_id }}' --target '{{ backup_restore_path }}'"
+  creates: '{{ backup_restore_path }}'
+
+- name: (RESTORE) Set owner of target directory to backup user/group
+  ansible.builtin.file:
+    group: '{{ backup_group }}'
+    mode: "0700"
+    owner: '{{ backup_user }}'
+    path: "{{backup_restore_path }}"
+    state: directory

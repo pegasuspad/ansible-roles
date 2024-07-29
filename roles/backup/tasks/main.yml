@@ -36,14 +36,6 @@
       }}
   loop: "{{ backup_repositories }}"
 
-- name: Display __backup_repository_list_key_value_pairs as dict
-  ansible.builtin.debug:
-    msg: '{{ __backup_repository_list_key_value_pairs | items2dict}}'
-
-- name: Display __backup_configs_with_defaults
-  ansible.builtin.debug:
-    msg: '{{ __backup_configs_with_defaults }}'
-
 - name: (BACKUP) Install and configure restic
   ansible.builtin.include_role:
     name: local.pegasuspad.restic
