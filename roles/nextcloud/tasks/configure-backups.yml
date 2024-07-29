@@ -22,16 +22,15 @@
   ansible.builtin.include_role:
     name: local.pegasuspad.backup
   vars:
-    backup_extra_tags:
-      - v{{ nextcloud_version }}
-    backup_hook_before: '{{ __nextcloud_backup.script_dir }}/stage-backup'
-    backup_repository:
-      aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
-      aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
-      location: '{{ nextcloud_backup_repository.url }}'
-      password: '{{ __nextcloud_backup.repository.password }}'
-    backup_schedule: '*-*-* *:00:00'
-    backup_schedule_enabled: '{{ nextcloud_backup_enabled }}'
+    backup_before_hook: '{{ __nextcloud_backup.script_dir }}/stage-backup'
+    backup_extra_tags: ['v{{ nextcloud_version }}']
+    backup_repositories:
+      - name: default
+        aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
+        aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
+        location: '{{ nextcloud_backup_repository.url }}'
+        password: '{{ __nextcloud_backup.repository.password }}'
+        schedule: '*-*-* *:00:00'
     backup_source_path: '{{ __nextcloud_paths.backup_staging }}'
 
 # - name: (BACKUP) Install and configure restic
