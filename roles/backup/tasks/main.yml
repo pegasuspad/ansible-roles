@@ -13,7 +13,7 @@
     __backup_configs_with_defaults: >-
       {{
         __backup_configs_with_defaults | default([]) + [
-          __backup_default_item | combine(item)
+          item | combine(__backup_default_item)
         ]
       }}
   loop: "{{ __backup_configs }}"
