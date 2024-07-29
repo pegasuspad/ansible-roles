@@ -8,9 +8,20 @@
 #     __backup_default_item: "{{ __backup_default_item | combine({ 'monitoring_call': backup_hook_after }) }}"
 #   when: backup_hook_after is defined
 
-- name: Display __backup_configs
+- name: (BACKUP) Merge defaults into backup configurations
+  ansible.builtin.set_fact:
+    __backup_configs_with_defaults: >-
+      {{
+        __backup_configs_with_defaults | default([]) + [
+          __backup_default_item | combine(item)
+        ]
+      }}
+  loop: "{{ __backup_configs }}"
+
+
+- name: Display __backup_configs_with_defaults
   ansible.builtin.debug:
-    msg: '{{ __backup_configs }}'
+    msg: '{{ __backup_configs_with_defaults }}'
 
 # - name: (BACKUP) Install and configure restic
 #   ansible.builtin.include_role:
