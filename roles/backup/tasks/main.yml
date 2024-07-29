@@ -1,3 +1,16 @@
+- name: Display __backup_default_pre_backup_cmd
+  ansible.builtin.debug:
+    var: __backup_default_pre_backup_cmd
+- name: Display __backup_default_item_base
+  ansible.builtin.debug:
+    var: __backup_default_item_base
+- name: Display __backup_default_item
+  ansible.builtin.debug:
+    var: __backup_default_item
+- name: Display __backup_backup_list
+  ansible.builtin.debug:
+    var: __backup_backup_list
+
 - name: (BACKUP) Install and configure restic
   ansible.builtin.include_role:
     name: local.pegasuspad.restic

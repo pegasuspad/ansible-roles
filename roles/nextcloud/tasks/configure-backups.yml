@@ -18,20 +18,6 @@
 #     state: present
 #     user: "root"
 
-
-- name: Display __backup_default_pre_backup_cmd
-  ansible.builtin.debug:
-    var: __backup_default_pre_backup_cmd
-- name: Display __backup_default_item_base
-  ansible.builtin.debug:
-    var: __backup_default_item_base
-- name: Display __backup_default_item
-  ansible.builtin.debug:
-    var: __backup_default_item
-- name: Display __backup_backup_list
-  ansible.builtin.debug:
-    var: __backup_backup_list
-
 - name: (BACKUP) Install and configure backup scripts
   ansible.builtin.include_role:
     name: local.pegasuspad.backup
@@ -39,14 +25,13 @@
     backup_extra_tags:
       - v{{ nextcloud_version }}
     backup_hook_before: '{{ __nextcloud_backup.script_dir }}/stage-backup'
-    backup_no_log: false
     backup_repository:
       aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
       aws_secret_access_key: '{{ __nextcloud_backup.repository.b2_access_key_secret }}'
       location: '{{ nextcloud_backup_repository.url }}'
       password: '{{ __nextcloud_backup.repository.password }}'
     backup_schedule: '*-*-* *:00:00'
-    backup_schedule_enabled: true
+    backup_schedule_enabled: '{{ nextcloud_backup_enabled }}'
     backup_source_path: '{{ __nextcloud_paths.backup_staging }}'
 
 # - name: (BACKUP) Install and configure restic
