@@ -1,11 +1,11 @@
 ---
 - name: (BACKUP) Set pre_backup_cmd if a "before" hook was specified
   ansible.builtin.set_fact:
-    __backup_default_item: '{{ __backup_default_item | combine({ pre_backup_cmd: backup_hook_before }) }}'
+    __backup_default_item: "{{ __backup_default_item | combine({ 'pre_backup_cmd': backup_hook_before }) }}"
   when: backup_hook_before is defined
 - name: (BACKUP) Set monitoring_call if an "after" hook was specified
   ansible.builtin.set_fact:
-    __backup_default_item: '{{ __backup_default_item | combine({ monitoring_call: backup_hook_after }) }}'
+    __backup_default_item: "{{ __backup_default_item | combine({ 'monitoring_call': backup_hook_after }) }}"
   when: backup_hook_after is defined
 
 - name: Display __backup_default_item
