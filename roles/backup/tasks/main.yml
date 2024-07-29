@@ -36,7 +36,7 @@
     restic_dir_owner: '{{ backup_user }}'
     restic_download_path: '{{ backup_script_dir }}'
     restic_no_log: '{{ backup_no_log }}'
-    restic_repos: '{{ __backup_repository_configs }}'
+    restic_repos: '{{ __backup_repository_configs | items2dict }}'
     restic_script_dir: '{{ backup_script_dir }}'
     restic_version: '{{ backup_restic_version }}'
   when: backup_enabled
