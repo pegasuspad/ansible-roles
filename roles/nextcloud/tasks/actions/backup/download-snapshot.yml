@@ -1,16 +1,16 @@
 ---
 #
 # Required Inputs:
-#   - backup_snapshot_id: ID of the snapshot to restore.
-#
-# Optional Inputs:
 #   -  backup_repository_name: Name of the repository from which to restore a snapshot. [nextcloud_backup_repository_name]
+#   - backup_snapshot_id: ID of the snapshot to restore.
 #
 
 - name: (RESTORE) Verify required parameters are set
   ansible.builtin.assert:
     fail_msg: Snapshot download request is invalid.
     that:
+      - backup_repository_name is defined
+      - backup_repository_name | length > 0
       - backup_snapshot_id is defined
       - backup_snapshot_id | length > 0
 
@@ -19,5 +19,5 @@
     name: local.pegasuspad.backup
     tasks_from: actions/download-snapshot.yml
   vars:
-    backup_repository_name: '{{ backup_repository_name | default(nextcloud_backup_repository_name) }}'
+    backup_repository_name: '{{ nextcloud_backup_repository_name }}'
     backup_restore_path: '{{ __nextcloud_paths.backup_restore }}/{{ backup_snapshot_id }}'
