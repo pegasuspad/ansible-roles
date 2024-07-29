@@ -1,11 +1,11 @@
 ---
 - name: (BACKUP) Set pre_backup_cmd if a "before" hook was specified
   ansible.builtin.set_fact:
-    __backup_default_item: "{{ __backup_default_item | combine({ 'pre_backup_cmd': backup_before_hook }) }}"
+    __backup_default_values: "{{ __backup_default_values | combine({ 'pre_backup_cmd': backup_before_hook }) }}"
   when: backup_before_hook is defined
 - name: (BACKUP) Set monitoring_call if an "after" hook was specified
   ansible.builtin.set_fact:
-    __backup_default_item: "{{ __backup_default_item | combine({ 'monitoring_call': backup_after_hook }) }}"
+    __backup_default_values: "{{ __backup_default_values | combine({ 'monitoring_call': backup_after_hook }) }}"
   when: backup_after_hook is defined
 
 - name: (BACKUP) Merge defaults into backup configurations
@@ -18,7 +18,7 @@
             'repo': item.name,
             'scheduled': item.schedule_enabled | d(item.schedule is defined),
             'schedule_oncalendar': item.schedule if item.schedule is defined else ''
-          } | combine(__backup_default_item)
+          } | combine(__backup_default_values)
         ]
       }}
   loop: "{{ backup_repositories }}"
@@ -57,4 +57,5 @@
     restic_repos: '{{ __backup_repository_list_key_value_pairs | items2dict }}'
     restic_script_dir: '{{ backup_script_dir }}'
     restic_version: '{{ backup_restic_version }}'
+    restic_systemd_timer_randomizeddelaysec: '{{ backup_randomized_delay_in_seconds }}'
   when: backup_enabled

@@ -19,8 +19,8 @@ backup_niceness: 10
 # backup_no_log: If true, command output is suppressed. [true]
 backup_no_log: true
 
-# backup_path: Source directory to use when creating backups.
-# backup_path:
+# backup_randomized_delay_in_seconds: Number of seconds (+/-) by which to randomize backup delays. [0]
+backup_randomized_delay_in_seconds: 0
 
 # backup_repositories: Configuration for backup repositories. Includes props below and from https://github.com/roles-ansible/ansible_role_restic?tab=readme-ov-file#repos. [None]
 # backup_repositories[].name: Unique name of the repository
@@ -33,6 +33,9 @@ backup_restic_version: 0.16.5
 
 # backup_script_dir: Path at which binaries and backup scripts wil be installed. [/opt/backup]
 backup_script_dir: /opt/backup
+
+# backup_source_path: Source directory to use when creating backups.
+# backup_source_path:
 
 # backup_group: User name for the backup user. [root]
 backup_user: root

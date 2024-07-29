@@ -24,7 +24,7 @@
   vars:
     backup_before_hook: '{{ __nextcloud_backup.script_dir }}/stage-backup'
     backup_extra_tags: ['v{{ nextcloud_version }}']
-    backup_path: '{{ __nextcloud_paths.backup_staging }}'
+    backup_source_path: '{{ __nextcloud_paths.backup_staging }}'
     backup_repositories:
       - name: default
         aws_access_key: '{{ __nextcloud_backup.repository.b2_access_key_id }}'
