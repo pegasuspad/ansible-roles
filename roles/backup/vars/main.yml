@@ -8,7 +8,7 @@ __backup_repo_list: '{{ [__backup_default_repository_item] + backup_extra_reposi
 # temp variable used to build __backup_backup_list
 __backup_default_item:
   niceness: '{{ backup_niceness }}'
-  src: '{{ backup_source_path }}'
+  src: '{{ backup_path }}'
   tags: '{{ backup_extra_tags }}'
 
 # __backup_default_monitoring_call: "{{ { monitoring_call: backup_hook_after } if backup_hook_after is defined else {} }}"
