@@ -13,10 +13,15 @@
     __backup_configs_with_defaults: >-
       {{
         __backup_configs_with_defaults | default([]) + [
-          item | combine(__backup_default_item)
+          {
+            'name': item.name,
+            'repo': item.name,
+            'scheduled': item.schedule_enabled | d(false),
+            'schedule_oncalendar': item.schedule if (item.schedule_enabled | d(false)) else ''
+          } | combine(__backup_default_item)
         ]
       }}
-  loop: "{{ __backup_configs }}"
+  loop: "{{ backup_repositories }}"
 
 - name: (BACKUP) Convert backup_repositories to list of key/value pairs
   ansible.builtin.set_fact:
@@ -31,9 +36,9 @@
       }}
   loop: "{{ backup_repositories }}"
 
-- name: Display __backup_repository_list_key_value_pairs
+- name: Display __backup_repository_list_key_value_pairs as dict
   ansible.builtin.debug:
-    msg: '{{ __backup_repository_list_key_value_pairs }}'
+    msg: '{{ __backup_repository_list_key_value_pairs | items2dict}}'
 
 - name: Display __backup_configs_with_defaults
   ansible.builtin.debug:
