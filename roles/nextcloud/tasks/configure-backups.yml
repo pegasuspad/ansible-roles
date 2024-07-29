@@ -1,7 +1,7 @@
 ---
 - name: (BACKUP) Install backup staging script
   ansible.builtin.template:
-    src: "/usr/local/bin/stage-backup"
+    src: "usr/local/bin/stage-backup"
     dest: '/usr/local/bin'
     owner: root
     group: root
