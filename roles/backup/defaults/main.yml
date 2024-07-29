@@ -25,7 +25,7 @@ backup_no_log: true
 # backup_repositories: Configuration for backup repositories. Includes props below and from https://github.com/roles-ansible/ansible_role_restic?tab=readme-ov-file#repos. [None]
 # backup_repositories[].name: Unique name of the repository
 # backup_repositories[].schedule: Schedule to use for backups. [none]
-# backup_repositories[].schedule_enabled: Command to run before making backups. [true if 'schedule' defined, else false]
+# backup_repositories[].schedule_enabled: Whether to enable scheduled backups to this repo or not. [true if 'schedule' defined, else false]
 backup_repositories: []
 
 # backup_restic_version: Version of restic to install. [0.16.5]

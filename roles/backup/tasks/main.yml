@@ -16,8 +16,8 @@
           {
             'name': item.name,
             'repo': item.name,
-            'scheduled': item.schedule_enabled | d(false),
-            'schedule_oncalendar': item.schedule if (item.schedule_enabled | d(false)) else ''
+            'scheduled': item.schedule_enabled | d(item.schedule is defined),
+            'schedule_oncalendar': item.schedule if item.schedule is defined else ''
           } | combine(__backup_default_item)
         ]
       }}

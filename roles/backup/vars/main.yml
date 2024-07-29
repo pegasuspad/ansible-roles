@@ -10,10 +10,3 @@ __backup_default_item:
   niceness: '{{ backup_niceness }}'
   src: '{{ backup_path }}'
   tags: '{{ backup_extra_tags }}'
-
-# __backup_default_monitoring_call: "{{ { monitoring_call: backup_hook_after } if backup_hook_after is defined else {} }}"
-# __backup_default_pre_backup_cmd: "{{ { pre_backup_cmd: backup_hook_before } if backup_hook_before is defined else {} }}"
-# __backup_default_item: '{{ __backup_default_item_base | combine(__backup_default_monitoring_call | combine(__backup_default_pre_backup_cmd)) }}'
-
-# __backup_configs: '{{ backup_repositories | map(''json_query'',''{name:name,repo:name,scheduled:schedule_enabled,schedule_oncalendar:schedule}'') | list }}'
-# __backup_repository_list: '{{ backup_repositories | ansible.utils.remove_keys(target=[''name'', ''schedule'', ''schedule_enabled'']) }}'
