@@ -18,21 +18,25 @@
       }}
   loop: "{{ __backup_configs }}"
 
+- name: Display __backup_repository_configs
+  ansible.builtin.debug:
+    msg: '{{ __backup_repository_configs }}'
+
 - name: Display __backup_configs_with_defaults
   ansible.builtin.debug:
     msg: '{{ __backup_configs_with_defaults }}'
 
-# - name: (BACKUP) Install and configure restic
-#   ansible.builtin.include_role:
-#     name: local.pegasuspad.restic
-#   vars:
-#     restic_backups: '{{ [__backup_default_item] + backup_extra_backups }}'
-#     restic_create_schedule: true
-#     restic_dir_group: '{{ backup_group }}'
-#     restic_dir_owner: '{{ backup_user }}'
-#     restic_download_path: '{{ backup_script_dir }}'
-#     restic_no_log: '{{ backup_no_log }}'
-#     restic_repos: '{{ __backup_repo_list | items2dict }}'
-#     restic_script_dir: '{{ backup_script_dir }}'
-#     restic_version: '{{ backup_restic_version }}'
-#   when: backup_enabled is defined
+- name: (BACKUP) Install and configure restic
+  ansible.builtin.include_role:
+    name: local.pegasuspad.restic
+  vars:
+    restic_backups: '{{ __backup_configs_with_defaults }}'
+    restic_create_schedule: true
+    restic_dir_group: '{{ backup_group }}'
+    restic_dir_owner: '{{ backup_user }}'
+    restic_download_path: '{{ backup_script_dir }}'
+    restic_no_log: '{{ backup_no_log }}'
+    restic_repos: '{{ __backup_repository_configs }}'
+    restic_script_dir: '{{ backup_script_dir }}'
+    restic_version: '{{ backup_restic_version }}'
+  when: backup_enabled
