@@ -10,7 +10,7 @@
 
 - name: (BACKUP) Install and configure backup utilities
   ansible.builtin.include_role:
-    name: local.pegasuspad.backup
+    name: skleinjung.core.backup
   vars:
     backup_before_hook: '/usr/local/bin/stage-backup'
     backup_extra_tags: ['v{{ nextcloud_version }}']

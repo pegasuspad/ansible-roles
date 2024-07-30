@@ -1,3 +1,3 @@
 ---
 dependencies:
-  - role: local.pegasuspad.python
+  - role: skleinjung.core.python

@@ -16,7 +16,7 @@
 
 - name: (RESTORE) Invoke backup role's download-snapshot tasks
   include_role:
-    name: local.pegasuspad.backup
+    name: skleinjung.core.backup
     tasks_from: actions/download-snapshot.yml
   vars:
     backup_repository_name: '{{ nextcloud_backup_repository_name }}'

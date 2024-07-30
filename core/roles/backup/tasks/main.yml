@@ -38,7 +38,7 @@
 
 - name: (BACKUP) Install and configure restic
   ansible.builtin.include_role:
-    name: local.pegasuspad.restic
+    name: skleinjung.core.restic
   vars:
     restic_backups: '{{ __backup_configs_with_defaults }}'
     restic_create_schedule: true
