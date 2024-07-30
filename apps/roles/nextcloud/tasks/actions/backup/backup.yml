@@ -8,5 +8,3 @@
 - name: (BACKUP) Create manual backup
   ansible.builtin.shell:
     cmd: '/usr/local/bin/backup-{{ backup_repository_name | default(nextcloud_backup_repository_name) }}.sh'
-
-
