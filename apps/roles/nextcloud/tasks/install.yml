@@ -28,7 +28,7 @@
     mode: "0755"
     url: "{{ __nextcloud_download_url }}"
   ansible.builtin.include_role:
-    name: fetch
+    name: skleinjung.core.fetch
     tasks_from: download.yml
 - name: Ensure Nextcloud directory exists
   ansible.builtin.file:
