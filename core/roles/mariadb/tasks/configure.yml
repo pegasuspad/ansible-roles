@@ -7,17 +7,26 @@
         that:
           - mariadb_root_password is defined
 
-- name: Apply hardened mysql configuration
-  ansible.builtin.import_role:
-    name: devsec.hardening.mysql_hardening
-  vars:
-    mysql_root_password: "{{ mariadb_root_password }}"
+# See: https://github.com/dev-sec/ansible-collection-hardening/issues/326
+- name: Set root credentials for mysql
+  block:
+    - name: reset root user for mariadb by connecting to socket
+      mysql_user:
+        name: root
+        password: "{{ mariadb_root_password }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+    - name: install .my.cnf with credentials
+      copy:
+        content: |
+          [client]
+          user=root
+          password='{{ mariadb_root_password | mandatory }}'
+        dest: "{{ ansible_env.HOME}}/.my.cnf"
+        mode: 0400
 
 - name: Read MySQL/MariaDB settings
   community.mysql.mysql_info:
     filter: settings
-    login_password: "{{ mariadb_root_password }}"
-    login_user: root
   register: mysql_settings
 
 - name: Move data to new datadir
@@ -53,6 +62,12 @@
       ansible.builtin.service:
         name: mysql
         state: restarted
+
+- name: Apply hardened mysql configuration
+  ansible.builtin.import_role:
+    name: devsec.hardening.mysql_hardening
+  vars:
+    mysql_root_password: "{{ mariadb_root_password }}"
 
 - name: "Manage databases"
   loop: "{{ mariadb_databases }}"
