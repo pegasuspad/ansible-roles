@@ -10,7 +10,11 @@
 # See: https://github.com/dev-sec/ansible-collection-hardening/issues/326
 - name: Set root credentials for mysql
   block:
-    - name: reset root user for mariadb by connecting to socket
+    # if our DB has already been configured with a root password, but .my.cnf is missing, this will fail
+    # this could happen if the server was rebuilt, for example... we ignore errors in this task, then write out
+    # credentials in the next one. Finally, we test connecting with the credentials without ignoring errors
+    - name: Atttempt to set initial root password, which will fail if there is one already set
+      ignore_errors: true
       mysql_user:
         name: root
         password: "{{ mariadb_root_password }}"
@@ -23,6 +27,10 @@
           password='{{ mariadb_root_password | mandatory }}'
         dest: "{{ ansible_env.HOME}}/.my.cnf"
         mode: 0400
+    - name: Test root credentials
+      community.mysql.mysql_info:
+        login_user: root
+        filter: version
 
 - name: Read MySQL/MariaDB settings
   community.mysql.mysql_info:
