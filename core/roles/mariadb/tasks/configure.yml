@@ -7,9 +7,17 @@
         that:
           - mariadb_root_password is defined
 
+- name: Apply hardened mysql configuration
+  ansible.builtin.import_role:
+    name: devsec.hardening.mysql_hardening
+  vars:
+    mysql_root_password: "{{ mariadb_root_password }}"
+
 - name: Read MySQL/MariaDB settings
   community.mysql.mysql_info:
     filter: settings
+    login_password: "{{ mariadb_root_password }}"
+    login_user: root
   register: mysql_settings
 
 - name: Move data to new datadir
@@ -45,12 +53,6 @@
       ansible.builtin.service:
         name: mysql
         state: restarted
-
-- name: Apply hardened mysql configuration
-  ansible.builtin.import_role:
-    name: devsec.hardening.mysql_hardening
-  vars:
-    mysql_root_password: "{{ mariadb_root_password }}"
 
 - name: "Manage databases"
   loop: "{{ mariadb_databases }}"
