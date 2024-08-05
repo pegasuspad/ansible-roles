@@ -142,5 +142,5 @@
     state: "{{ postgres_service_state }}"
     user: "{{ postgres_uid | default(omit) }}"
     volumes:
-      - /etc/postgresql:/etc/postgresql:ro,Z
-      - /etc/postgresql/initdb.d:/docker-entrypoint-initdb.d:Z
+      - /etc/postgresql:/etc/postgresql:ro
+      - /etc/postgresql/initdb.d:/docker-entrypoint-initdb.d
