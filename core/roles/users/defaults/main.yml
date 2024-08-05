@@ -13,10 +13,9 @@ users_extra: []
 # users_default_user.shell: Shell to user for the user. [/bin/false for system users, /bin/bash for others]
 # users_default_user.uid: Optional UID for the new user. (Default: assign automatically)
 # users_default_user.username: Name of the user to manage
-users_default_user:
-  groups:
-    - adm
-    - docker
-    - sudo
-  uid: 60000
-  username: sean
+# users_default_user:
+  # groups:
+  #   - adm
+  #   - docker
+  #   - sudo
+  # username: sean
