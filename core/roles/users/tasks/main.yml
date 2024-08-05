@@ -1,6 +1,6 @@
 ---
 - name: "Create user"
-  loop: "{{ [users_default_user] + users_extra }}"
+  loop: "{{ users_extra }}"
   loop_control:
     loop_var: user
   ansible.builtin.include_tasks: _create_user.yml
